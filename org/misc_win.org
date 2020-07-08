@@ -1,0 +1,51 @@
+#  -*- coding: utf-8 -*-
+
+* font
+#+BEGIN_SRC emacs-lisp
+(set-face-attribute
+ 'default nil
+ :font (font-spec :name "-outline-Consolas-bold-italic-normal-mono-*-*-*-*-c-*-iso10646-1"
+                  :weight 'normal
+                  :slant 'normal
+                  :size 12.5))
+(dolist (charset '(kana han symbol cjk-misc bopomofo))
+  (set-fontset-font
+   (frame-parameter nil 'font)
+   charset
+   (font-spec :name "-outline-微软雅黑-normal-normal-normal-sans-*-*-*-*-p-*-iso10646-1"
+              :weight 'normal
+              :slant 'normal
+              :size 13.5)))
+#+END_SRC
+* coding
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'gb18030)
+#+END_SRC
+* functions
+#+BEGIN_SRC emacs-lisp
+(defun ctags-create (path)
+  (interactive "Dcreate ctags from:")
+  (cd path)
+  (pwd)
+  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c -R -f tags-c")
+  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c++ -R -f tags-cpp")
+  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=lua -R -f tags-lua")
+  )
+#+END_SRC
+
+* xref tags
+#+BEGIN_SRC emacs-lisp
+(setq tags-table-list '())
+#+END_SRC
+* flycheck args
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+* irony
+#+BEGIN_SRC emacs-lisp
+;; Windows performance tweaks
+(when (boundp 'w32-pipe-read-delay)
+  (setq w32-pipe-read-delay 0))
+;; Set the buffer size to 64K on Windows (from the original 4K)
+(when (boundp 'w32-pipe-buffer-size)
+  (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
+#+END_SRC
