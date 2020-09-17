@@ -23,16 +23,16 @@
 #+END_SRC
 * functions
 #+BEGIN_SRC emacs-lisp
-(defun ctags-create (path)
-  (interactive "Dcreate ctags from:")
-  (cd path)
-  (pwd)
-  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c -R -f tags-c")
-  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c++ -R -f tags-cpp")
-  (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=lua -R -f tags-lua")
-  )
+;; (defun ctags-create (path)
+;;   (interactive "Dcreate ctags from:")
+;;   (cd path)
+;;   (pwd)
+;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c -R -f tags-c")
+;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c++ -R -f tags-cpp")
+;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=lua -R -f tags-lua")
+;;   )
+;; find . -type f \( -name "*.cpp" -o -name "*.h" \) -exec ls {} ; ctags -a -B --declarations -d --globals --members -Q -T --lang=c++
 #+END_SRC
-
 * xref tags
 #+BEGIN_SRC emacs-lisp
 (setq tags-table-list '())

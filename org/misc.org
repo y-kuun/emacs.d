@@ -13,6 +13,10 @@
    2. ORG_WORK_ROOT 指向当前工作相关的org目录
 ** 需要注意的是
    当init.el中的，selected-package变量的值可能不能正确的表达，这不分可能需要手动的处理
+* path
+  #+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/lisp")
+  #+END_SRC
 * pacakge
   #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -54,17 +58,15 @@
 
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-  (setq buffer-file-coding-system 'utf-8-dos)
+  (setq buffer-file-coding-system 'utf-8)
   (setq make-backup-files nil)
   (setq create-lockfiles nil)
 
   ;; disable annoying beeeeep !!!
   (setq visible-bell nil ring-bell-function (lambda ()))
   #+END_SRC
-* mode
+* modes
   #+BEGIN_SRC emacs-lisp
-
-  ;; gui related
   (tool-bar-mode 0)
   (menu-bar-mode 0)
   (toggle-scroll-bar 0)
@@ -77,197 +79,187 @@
   (semantic-mode t)
   #+END_SRC
 * key binding
-  #+BEGIN_SRC emacs-lisp
-  ;; personal short-cuts
-  (global-set-key (kbd "<f4>") 'flycheck-mode)
-  (global-set-key (kbd "<f7>") 'hs-minor-mode)
-  (global-set-key (kbd "<f9>") 'ykdu-shell-command)
+ #+BEGIN_SRC emacs-lisp
+ ;; personal short-cuts
+ (global-set-key (kbd "<f4>") 'flycheck-mode)
+ (global-set-key (kbd "<f9>") 'ykdu-shell-command)
 
-  (global-set-key (kbd "M-p") 'backward-paragraph)
-  (global-set-key (kbd "M-n") 'forward-paragraph)
-  (global-set-key (kbd "C-o") 'newline-and-indent)
+ (global-set-key (kbd "M-p") 'backward-paragraph)
+ (global-set-key (kbd "M-n") 'forward-paragraph)
+ (global-set-key (kbd "C-o") 'newline-and-indent)
 
-  (progn
-	(global-set-key (kbd "C-c k") 'key-command-prefix)
-	(define-prefix-command 'key-command-prefix)
+ (progn
+   (global-set-key (kbd "C-c k") 'key-command-prefix)
+   (define-prefix-command 'key-command-prefix)
 
-	(define-key key-command-prefix (kbd "j") 'windmove-down)
-	(define-key key-command-prefix (kbd "k") 'windmove-up)
-	(define-key key-command-prefix (kbd "h") 'windmove-left)
-	(define-key key-command-prefix (kbd "l") 'windmove-right)
-	)
-
-  (progn
-	(global-set-key (kbd "C-;") 'ykdu-major-map)
-	(define-prefix-command 'ykdu-major-map)
-
-	(define-key ykdu-major-map (kbd "f") 'find-name-dired)
-	(define-key ykdu-major-map (kbd "F") 'projectile-find-file)
-	(define-key ykdu-major-map (kbd "g") 'rg-thing-at-point)
-	(define-key ykdu-major-map (kbd "G") 'rg-thing-at-point-default)
-
-	(define-key ykdu-major-map (kbd "1") 'flycheck-list-errors)
-
-	(define-key ykdu-major-map (kbd "e") 'open-fold)
-	(define-key ykdu-major-map (kbd "b") 'pop-tag-mark)
-
-	(define-key ykdu-major-map (kbd "s") 'store-cur-file-name)
-	)
-
-  (global-set-key (kbd "C-' s") 'hs-show-all)
-  (global-set-key (kbd "C-' h") 'hs-hide-all)
-  (global-set-key (kbd "C-<tab>") 'hs-hide-level)
-  (global-set-key (kbd "<backtab>") 'hs-toggle-hiding)
-
-  (global-set-key (kbd "C-M-.") 'xref-find-apropos-at-point)
-  #+END_SRC
-* path
-  #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/lisp")
-  #+END_SRC
-* function
-  #+BEGIN_SRC emacs-lisp
-  (defun ykdu-command (command-buffer)
-    "Run shell command and output to given buffer"
-    (let* ((output-buffer command-buffer)
-           (error-buffer output-buffer))
-
-      (setq compile_command (read-string "Shell Command: "))
-      (get-buffer-create output-buffer)
-      (get-buffer-create error-buffer)
-      (kill-buffer output-buffer-name)
-      ;;    (shell-command s_command output-buffer error-buffer)
-      (switch-to-buffer-other-window output-buffer)
-      (with-current-buffer output-buffer
-        (read-only-mode -1)
-        (kill-region (point-min) (point-max))
-        (insert "Process Begins !!!!\n")
-        (insert (format-time-string "%F %H:%M:%S(%3N)"))
-        (insert "\n=====================================\n\n")
-        (let* ((command_result (shell-command-to-string compile_command)))
-          (insert (decode-coding-string command_result 'gbk)))
-        (insert "\n=====================================\n")
-        (insert "Process Finished !!!!\n")
-        (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
-        (compilation-mode)
-        (beginning-of-buffer)
-        )
-      ;; back to previous window
-      (other-window -1)
-      )
-    )
-
-  (defun ykdu-shell-command ()
-    (interactive)
-    (let (
-          (bf-name (buffer-file-name))
-          (output-buffer-name "*ykdu-shell*")
-          )
-      (let (
-            (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
-            )
-        (ykdu-command output-buffer-name)
-        )
-      )
-    )
-
-  ;; (defun workspace-coding-set (coding)
-  ;;   (interactive "zCoding: ")
-  ;;   "set defualt coding systems and prefer coding system at once"
-  ;;   (set-default-coding-systems coding)
-  ;;   ;; (locale-coding-system coding)
-  ;;   (prefer-coding-system coding)
-  ;;   )
-
-  (defun open-fold (path)
-    "update for mf client"
-    (interactive "Dstart from: ")
-    (message (concat "start \"" path "\""))
-    (browse-url-of-file path)
-    )
-
-  (defun save-dir-path (path)
-    (interactive "Dcopy: ")
-    ;; (message (concat "start " path))
-    (kill-new path)
-    )
-
-  (defun copy-cur-dir-path (path)
-    (interactive "Dcopy from: ")
-    ;; (message (concat "start " path))
-    (kill-new path)
-    )
-
-  (defun store-cur-file-name ()
-    (interactive)
-    (kill-new (file-name-nondirectory buffer-file-name))
-    )
-
-  (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org"))
-
-  (defun rg-thing-at-point-default (search-term &optional arg)
-    (interactive
-     (list
-      (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
-                                    (if current-prefix-arg
-                                        "regexp "
-                                      ""))
-                            (projectile-symbol-or-selection-at-point))
-      current-prefix-arg))
-    (ripgrep-regexp search-term default-directory rg-ykuun-args)
-    )
-
-  (defun rg-thing-at-point (search-term &optional arg)
-    (interactive
-     (list
-      (read-from-minibuffer (format "Ripgrep %ssearch for: "
-                                    (if current-prefix-arg
-                                        "regexp "
-                                      ""))
-                            (projectile-symbol-or-selection-at-point))
-      current-prefix-arg))
-    (if (projectile-project-root)
-        (progn
-          (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
-          )
-      (message "default root do ripgrep")
-      (ripgrep-regexp search-term default-directory rg-ykuun-args)
-      )
-    )
-
-  (require 'projectile)			; add this line to enable projectile-symbol-or-selection-at-point function
-
-  (defun xref-find-apropos-at-point (search-term &optional arg)
-    (interactive
-     (list
-      (read-from-minibuffer (format "xref find apropos %ssearch for: "
-                                    (if current-prefix-arg
-                                        "regexp "
-                                      ""))
-                            (projectile-symbol-or-selection-at-point))
-      current-prefix-arg))
-    (xref-find-apropos search-term)
-    )
-
-  (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
-    (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
-    (message (concat current-root-dir "/"))
-    (if (file-readable-p (concat current-root-dir "tags-c")) 
-        (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
-    (if (file-readable-p (concat current-root-dir "tags-lua")) 
-        (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
-    (if (file-readable-p (concat current-root-dir "tags-cpp")) 
-        (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
-    )
-#+END_SRC
-* recentf
-  #+BEGIN_SRC emacs-lisp
-  (recentf-mode t)
-  (setq
-   recentf-max-menu-items 400
-   recentf-max-saved-items nil
+   (define-key key-command-prefix (kbd "j") 'windmove-down)
+   (define-key key-command-prefix (kbd "k") 'windmove-up)
+   (define-key key-command-prefix (kbd "h") 'windmove-left)
+   (define-key key-command-prefix (kbd "l") 'windmove-right)
    )
-  #+END_SRC
+
+ (progn
+   (global-set-key (kbd "C-;") 'ykdu-major-map)
+   (define-prefix-command 'ykdu-major-map)
+
+   (define-key ykdu-major-map (kbd "f") 'find-name-dired)
+   (define-key ykdu-major-map (kbd "F") 'projectile-find-file)
+   (define-key ykdu-major-map (kbd "g") 'rg-thing-at-point)
+   (define-key ykdu-major-map (kbd "G") 'rg-thing-at-point-default)
+
+   (define-key ykdu-major-map (kbd "1") 'flycheck-list-errors)
+
+   (define-key ykdu-major-map (kbd "e") 'open-fold)
+   (define-key ykdu-major-map (kbd "b") 'pop-tag-mark)
+
+   (define-key ykdu-major-map (kbd "s") 'store-cur-file-name)
+   )
+
+ (global-set-key (kbd "C-M-.") 'xref-find-apropos-at-point)
+ #+END_SRC
+* function
+ #+BEGIN_SRC emacs-lisp
+ (defun ykdu-command (command-buffer)
+   "Run shell command and output to given buffer"
+   (let* ((output-buffer command-buffer)
+          (error-buffer output-buffer))
+
+     (setq compile_command (read-string "Shell Command: "))
+     (get-buffer-create output-buffer)
+     (get-buffer-create error-buffer)
+     (kill-buffer output-buffer-name)
+     ;;    (shell-command s_command output-buffer error-buffer)
+     (switch-to-buffer-other-window output-buffer)
+     (with-current-buffer output-buffer
+       (read-only-mode -1)
+       (kill-region (point-min) (point-max))
+       (insert "Process Begins !!!!\n")
+       (insert (format-time-string "%F %H:%M:%S(%3N)"))
+       (insert "\n=====================================\n\n")
+       (let* ((command_result (shell-command-to-string compile_command)))
+         (insert (decode-coding-string command_result 'gbk)))
+       (insert "\n=====================================\n")
+       (insert "Process Finished !!!!\n")
+       (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
+       (compilation-mode)
+       (beginning-of-buffer)
+       )
+     ;; back to previous window
+     (other-window -1)
+     )
+   )
+
+ (defun ykdu-shell-command ()
+   (interactive)
+   (let (
+         (bf-name (buffer-file-name))
+         (output-buffer-name "*ykdu-shell*")
+         )
+     (let (
+           (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
+           )
+       (ykdu-command output-buffer-name)
+       )
+     )
+   )
+
+ ;; (defun workspace-coding-set (coding)
+ ;;   (interactive "zCoding: ")
+ ;;   "set defualt coding systems and prefer coding system at once"
+ ;;   (set-default-coding-systems coding)
+ ;;   ;; (locale-coding-system coding)
+ ;;   (prefer-coding-system coding)
+ ;;   )
+
+ (defun open-fold (path)
+   "update for mf client"
+   (interactive "Dstart from: ")
+   (message (concat "start \"" path "\""))
+   (browse-url-of-file path)
+   )
+
+ (defun save-dir-path (path)
+   (interactive "Dcopy: ")
+   ;; (message (concat "start " path))
+   (kill-new path)
+   )
+
+ (defun copy-cur-dir-path (path)
+   (interactive "Dcopy from: ")
+   ;; (message (concat "start " path))
+   (kill-new path)
+   )
+
+ (defun store-cur-file-name ()
+   (interactive)
+   (kill-new (file-name-nondirectory buffer-file-name))
+   )
+
+ (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json"))
+
+ (defun rg-thing-at-point-default (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (ripgrep-regexp search-term default-directory rg-ykuun-args)
+   )
+
+ (defun rg-thing-at-point (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "Ripgrep %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (if (projectile-project-root)
+       (progn
+         (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
+         )
+     (message "default root do ripgrep")
+     (ripgrep-regexp search-term default-directory rg-ykuun-args)
+     )
+   )
+
+ (require 'projectile)			; add this line to enable projectile-symbol-or-selection-at-point function
+
+ (defun xref-find-apropos-at-point (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "xref find apropos %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (xref-find-apropos search-term)
+   )
+
+ ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
+ ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
+ ;;   (message (concat current-root-dir "/"))
+ ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
+ ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
+ ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
+ ;;   )
+ #+END_SRC
+* recentf
+#+BEGIN_SRC emacs-lisp
+(recentf-mode t)
+(setq
+ recentf-max-menu-items 400
+ recentf-max-saved-items nil
+ )
+#+END_SRC
 * C\CPP
 #+BEGIN_SRC emacs-lisp
 (setq-default c++-tab-always-indent t)
@@ -294,7 +286,6 @@
   #+BEGIN_SRC emacs-lisp
   (setq-default lua-indent-level 4)
   #+END_SRC
-
 * Python
   #+BEGIN_SRC emacs-lisp
   ;; Python
@@ -310,7 +301,6 @@
   (remove-hook 'find-file-hook 'vc-refresh-state)
   ;; (setq jit-lock-defer-time 0.01)
   ;; (setq font-lock-support-mode 'fast-lock-mode)
-
   ;; magit receiving gbk from git.exe
   (setq magit-git-output-coding-system 'utf-8)
   ;; (setq magit-git-output-coding-system 'chinese-gbk)
@@ -342,102 +332,105 @@
   ;; (set-face-background 'highlight-indentation-current-column-face "#c3b3b3")
   #+END_SRC
 * grep
-  #+BEGIN_SRC emacs-lisp
-  (setq grep-command "rg --vimgrep -i -t cpp -t lua -t cs -t c -t config -t txt ")
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(setq grep-command "rg --vimgrep -i -t cpp -t lua -t cs -t c -t config -t txt ")
+#+END_SRC
 * org mode
-  #+BEGIN_SRC emacs-lisp
-  (setq
-   org-agenda-files nil
-   org-tags-column -90
-   org-src-tab-acts-natively t
-   org-edit-src-content-indentation 0
-   )
+#+BEGIN_SRC emacs-lisp
+(setq
+ org-agenda-files nil
+ org-tags-column -90
+ org-src-tab-acts-natively t
+ org-edit-src-content-indentation 0
+ )
 
-  (require 'org-protocol)
-  (require 'edit-server)
-  (require 'server)
+(require 'org-protocol)
+(require 'edit-server)
+(require 'server)
 
-  (defun server-ensure-safe-dir (dir) "Noop" t) ; 非常烦人的一个错误，直接将相关的函数置空
+(defun server-ensure-safe-dir (dir) "Noop" t) ; 非常烦人的一个错误，直接将相关的函数置空
 
-  (server-start)				; 注意需要手动创建文件夹
-  (edit-server-start)
-  (setq edit-server-new-frame nil)
+(server-start)				; 注意需要手动创建文件夹
+(edit-server-start)
+(setq edit-server-new-frame nil)
 
-  ;; babel 这个地方不添加将会导致相关的babel无法被加载
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '(
-	 (python . t)
-	 (matlab . t)
-	 (emacs-lisp . t)
-	 (lua . t)
-	 (shell . t)
-	 ;; (C . t)
-	 ))
+;; babel 这个地方不添加将会导致相关的babel无法被加载
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '(
+   (python . t)
+   (matlab . t)
+   (emacs-lisp . t)
+   (lua . t)
+   (shell . t)
+   ;; (C . t)
+   ))
 
-  ;; (setq 
-  ;;  org-babel-C++-compiler "clang++"
-  ;;  org-babel-C-compiler "clang"
-  ;;  )
+;; (setq 
+;;  org-babel-C++-compiler "clang++"
+;;  org-babel-C-compiler "clang"
+;;  )
 
-  (org-indent-mode)
-  (org-display-inline-images t t)
-  (setq org-todo-keywords
-		'((sequence "TODO" "DOING" "ARCHIVE" "|" "DONE" "ABORT" "SUSPENDED")))
-  (setq org-agenda-inhibit-startup t)
-  (setq org-startup-indented t)
+(org-indent-mode)
+(org-display-inline-images t t)
+(setq org-todo-keywords
+      '((sequence "TODO" "DOING" "ARCHIVE" "|" "DONE" "ABORT" "SUSPENDED")))
+(setq org-agenda-inhibit-startup t)
+(setq org-startup-indented t)
 
-  ;; VAR
-  (message (concat "SET ORG ROOT TO " (getenv "ORG_ROOT")))
-  (message (concat "SET ORG WORK ROOT TO " (getenv "ORG_WORK_ROOT")))
-  (setq org-directory (getenv "ORG_ROOT"))
-  ;; (add-hook 'after-init-hook '(lambda () (org-todo-list) (get-buffer "*Org Agenda*")))
-  ;; .\emacsclientw.exe "org-protocol:///capture?template=w&url=http%3a%2f%2fduckduckgo%2ecom&title=DuckDuckGo"
-  (setq org-work-daily (concat (getenv "ORG_WORK_ROOT") "/daily.org"))
-  (setq org-incomming-work (concat (getenv "ORG_WORK_ROOT") "/incoming_work.org"))
-  (setq org-capture-templates
-		'(
-		  ("t" "Todo" entry (file+headline "inbox.org" "Incomming")
-		   "* TODO %?\n %T\n %i\n %a")
-		  ("w" "Website with Tags" entry (file+headline "sites.org" "Regular Visit Sites")
-		   "* %:description %?\t%^g\nLINK: %:annotation\nCaptured On: %U")
-		  ("W" "Website" entry (file+headline "sites.org" "Regular Visit Sites")
-		   "* %:description %?\t\nLINK: %:annotation\nCapured On: %U")
-		  ("R" "Website ToRead" entry (file+headline "sites.org" "Sites ToRead")
-		   "* TOREAD %:description %?\t%^g\nLINK: %:annotation\nCapured On: %U")
-		  ("d" "Daily Recording" entry (file+datetree "daily.org")
-		   "* %?\n %i\n %a" :tree-type week)
-		  ("r" "Tools and Refers" entry (file+headline "refers.org" "Tools & Refers")
-		   "* %:description %?\t\nLINK: %:annotation\n%U")
-		  ("l" "DO IT WHILE ALIVE" entry (file+headline "life.org" "LIFE MOVES ON")
-		   "* PLAN %?\n %a\n %T\n %i\n")
-		  ("D" "Work Daily Recording" entry (file+datetree org-work-daily "Daily Records")
-		   "* %?\n %i\n %a" :tree-type week)
-		  ("T" "Work TAPD Recording" entry (file+olp+datetree org-work-daily "TAPD Records")
-		   "* %?\n %i\n %a" :tree-type week)
-		  ("i" "Incoming Works" entry (file+headline org-incomming-work "Looks Good To Me!!!!")
-		   "* TODO %?\n %a\n %T\n %i\n")
-		  )
-		)
+;; VAR
+(message (concat "SET ORG ROOT TO " (getenv "ORG_ROOT")))
+(message (concat "SET ORG WORK ROOT TO " (getenv "ORG_WORK_ROOT")))
+(setq org-directory (getenv "ORG_ROOT"))
+;; (add-hook 'after-init-hook '(lambda () (org-todo-list) (get-buffer "*Org Agenda*")))
+;; .\emacsclientw.exe "org-protocol:///capture?template=w&url=http%3a%2f%2fduckduckgo%2ecom&title=DuckDuckGo"
+(setq org-work-daily (concat (getenv "ORG_WORK_ROOT") "/daily.org"))
+(setq org-incomming-work (concat (getenv "ORG_WORK_ROOT") "/incoming_work.org"))
+(setq org-capture-templates
+      '(
+        ("t" "Todo" entry (file+headline "inbox.org" "Incomming")
+         "* TODO %?\n %T\n %i\n %a")
+        ("w" "Website with Tags" entry (file+headline "sites.org" "Regular Visit Sites")
+         "* %:description %?\t%^g\nLINK: %:annotation\nCaptured On: %U")
+        ("W" "Website" entry (file+headline "sites.org" "Regular Visit Sites")
+         "* %:description %?\t\nLINK: %:annotation\nCapured On: %U")
+        ("R" "Website ToRead" entry (file+headline "sites.org" "Sites ToRead")
+         "* TOREAD %:description %?\t%^g\nLINK: %:annotation\nCapured On: %U")
+        ("d" "Daily Recording" entry (file+datetree "daily.org")
+         "* %?\n %i\n %a" :tree-type week)
+        ("r" "Tools and Refers" entry (file+headline "refers.org" "Tools & Refers")
+         "* %:description %?\t\nLINK: %:annotation\n%U")
+        ("l" "DO IT WHILE ALIVE" entry (file+headline "life.org" "LIFE MOVES ON")
+         "* PLAN %?\n %a\n %T\n %i\n")
+        ("D" "Work Daily Recording" entry (file+datetree org-work-daily "Daily Records")
+         "* %?\n %i\n %a" :tree-type week)
+        ("T" "Work TAPD Recording" entry (file+olp+datetree org-work-daily "TAPD Records")
+         "* %?\n %i\n %a" :tree-type week)
+        ("i" "Incoming Works" entry (file+headline org-incomming-work "Looks Good To Me!!!!")
+         "* TODO %?\n %a\n %T\n %i\n")
+        )
+      )
 
-  ;; KEY BINDING
-  (global-set-key (kbd "C-c l") 'org-store-link)
-  (global-set-key (kbd "C-c C-l") 'org-insert-link)
-  (global-set-key (kbd "C-c a") 'org-agenda)
-  (global-set-key (kbd "C-c c") 'org-capture)
-  #+END_SRC
+;; KEY BINDING
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c C-l") 'org-insert-link)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+#+END_SRC
 * lsp mode                                                                    :DEPRECATED:
-  #+BEGIN_SRC emacs-lisp
-  ;; (require 'lsp)
-  ;; (require 'lsp-clients)
-  ;; (add-hook 'c++-mode-hook 'lsp)
-  ;; (add-hook 'c-mode-hook 'lsp)
-  ;; (require 'ccls)
-  ;; (add-hook 'c++-mode-hook (lambda () (require 'ccls) (lsp)))
-  ;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
-  ;; (setq-default lsp-file-watch-threshold 200000)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(require 'lsp)
+(require 'lsp-ui)
+(require 'lsp-clangd)
+
+(add-hook 'c++-mode-hook 'lsp)
+(add-hook 'c-mode-hook 'lsp)
+;; (require 'ccls)
+;; (add-hook 'c++-mode-hook (lambda () (require 'ccls) (lsp)))
+;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
+;; (setq-default lsp-file-watch-threshold 200000)
+;; (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+#+END_SRC
 * eglot                                                                       :DEPRECATED:
   #+BEGIN_SRC emacs-lisp
   ;; (add-hook 'c-mode-hook 'eglot-ensure)
