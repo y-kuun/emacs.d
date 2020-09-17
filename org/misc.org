@@ -13,6 +13,11 @@
    2. ORG_WORK_ROOT 指向当前工作相关的org目录
 ** 需要注意的是
    当init.el中的，selected-package变量的值可能不能正确的表达，这不分可能需要手动的处理
+** UnrealEngine
+#+BEGIN_SRC bat :results value
+set LDFLAGS="-fuse-ld=lld-link"
+cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang.exe" -DCMAKE_CXX_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang++.exe" -DCMAKE_C_COMPILER_ID="Clang" -DCMAKE_CXX_COMPILER_ID="Clang" -DCMAKE_SYSTEM_NAME="Generic" ..
+#+END_SRC
 * path
   #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/lisp")
