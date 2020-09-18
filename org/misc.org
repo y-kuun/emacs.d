@@ -426,18 +426,23 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+BEGIN_SRC emacs-lisp
 (require 'lsp)
 (require 'lsp-ui)
-(require 'lsp-clangd)
 
-(add-hook 'c++-mode-hook 'lsp)
-(add-hook 'c-mode-hook 'lsp)
+;; (add-hook 'c++-mode-hook 'lsp)
+;; (add-hook 'c-mode-hook 'lsp)
+;; ;; (setq lsp-clients-clangd-executable "D:/workspace/thirdparty bin/llvm-project/build/Release/bin/clangd.exe")
 ;; (require 'ccls)
 ;; (add-hook 'c++-mode-hook (lambda () (require 'ccls) (lsp)))
 ;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
+
 ;; (setq-default lsp-file-watch-threshold 200000)
 ;; (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
 #+END_SRC
 * eglot                                                                       :DEPRECATED:
   #+BEGIN_SRC emacs-lisp
+    ;; (add-hook 'c-mode-hook 'eglot-ensure)
+    ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; (require 'eglot)
+  ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   ;; (add-hook 'c-mode-hook 'eglot-ensure)
   ;; (add-hook 'c++-mode-hook 'eglot-ensure)
   #+END_SRC
@@ -588,6 +593,11 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
   (add-to-list 'display-buffer-alist
 			   (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
   #+END_SRC
+* Code Navigation
+#+BEGIN_SRC emacs-lisp
+;; (defalias 'xref-find-definitions 'counsel-etags-find-tag-at-point)
+;; (defalias 'xref-find-apropos-at-point 'counsel-etags-grep)
+#+END_SRC
 * Appendix
   #+BEGIN_SRC shell
   ;; (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extra=+q --fields=+iaS --languages=c -R -f tags-c")

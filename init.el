@@ -15,7 +15,7 @@
  '(gnutls-algorithm-priority "normal:-vers-tls1.3")
  '(package-selected-packages
    (quote
-	(company-lsp lsp-ui counsel-gtags flycheck-clang-analyzer flycheck-clang-tidy csharp-mode clang-format company-c-headers eldoc-eval eldoc c-eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org ivy-xref counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region ido-at-point yasnippet flycheck projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server gnu-elpa-keyring-update cmake-mode magit markdown-mode))))
+	(ccls lsp-treemacs company-lsp lsp-ui counsel-gtags flycheck-clang-analyzer flycheck-clang-tidy csharp-mode clang-format company-c-headers eldoc-eval eldoc c-eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org ivy-xref counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region ido-at-point yasnippet flycheck projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server gnu-elpa-keyring-update cmake-mode magit markdown-mode))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
