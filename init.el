@@ -11,7 +11,7 @@
    '("13a8eaddb003fd0d561096e11e1a91b029d3c9d64554f8e897b2513dbf14b277" default))
  '(global-font-lock-mode t)
  '(global-linum-mode nil)
- '(gnutls-algorithm-priority "normal:-vers-tls1.3")
+ '(gnutls-algorithm-priority "normal:-vers-tls1.3" t)
  '(package-selected-packages
    '(gnu-elpa-keyring-update company-lsp counsel-gtags csharp-mode clang-format company-c-headers eldoc-eval eldoc c-eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org ivy-xref counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region ido-at-point yasnippet projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server cmake-mode magit markdown-mode)))
 (custom-set-faces
@@ -21,10 +21,10 @@
  ;; If there is more than one, they won't work right.
  )
 
-
 (add-to-list 'load-path "~/.emacs.d/lisp")
 
 (require 'package)
+(setq package-check-signature nil)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
 		    (not (gnutls-available-p))))
        (proto (if no-ssl "http" "https")))
@@ -43,29 +43,21 @@
     (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
 (package-initialize)
 ;; use domestic source
 (setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
 			 ("melpa" . "http://elpa.emacs-china.org/melpa/")))
-
-(setq package-check-signature nil)
-
-(require 'org)
 
 (when (eq system-type 'windows-nt)
   (org-babel-load-file
    (expand-file-name "org/misc_win.org"
 					 user-emacs-directory))
   )
-
 (when (eq system-type 'darwin)
   (org-babel-load-file
    (expand-file-name "org/misc_darwin.org"
 					 user-emacs-directory))
-
   )
-
 (org-babel-load-file
  (expand-file-name "org/misc.org"
 				   user-emacs-directory)

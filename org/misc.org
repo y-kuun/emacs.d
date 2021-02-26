@@ -16,6 +16,9 @@
 set LDFLAGS="-fuse-ld=lld-link"
 cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang.exe" -DCMAKE_CXX_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang++.exe" -DCMAKE_C_COMPILER_ID="Clang" -DCMAKE_CXX_COMPILER_ID="Clang" -DCMAKE_SYSTEM_NAME="Generic" ..
 #+END_SRC
+** LINKS
+[[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][EmacsWiki: Optimizing Emacs Startup]]
+[[https://emacs-lsp.github.io/lsp-mode/page/performance/][Performance - LSP Mode - LSP support for Emacs]]
 * misc configs
   #+BEGIN_SRC emacs-lisp
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -90,138 +93,136 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
  #+END_SRC
 * function
  #+BEGIN_SRC emacs-lisp
- (defun ykdu-command (command-buffer)
-   "Run shell command and output to given buffer"
-   (let* ((output-buffer command-buffer)
-          (error-buffer output-buffer))
+   (defun ykdu-command (command-buffer)
+     "Run shell command and output to given buffer"
+     (let* ((output-buffer command-buffer)
+	    (error-buffer output-buffer))
 
-     (setq compile_command (read-string "Shell Command: "))
-     (get-buffer-create output-buffer)
-     (get-buffer-create error-buffer)
-     (kill-buffer output-buffer-name)
-     ;;    (shell-command s_command output-buffer error-buffer)
-     (switch-to-buffer-other-window output-buffer)
-     (with-current-buffer output-buffer
-       (read-only-mode -1)
-       (kill-region (point-min) (point-max))
-       (insert "Process Begins !!!!\n")
-       (insert (format-time-string "%F %H:%M:%S(%3N)"))
-       (insert "\n=====================================\n\n")
-       (let* ((command_result (shell-command-to-string compile_command)))
-         (insert (decode-coding-string command_result 'gbk)))
-       (insert "\n=====================================\n")
-       (insert "Process Finished !!!!\n")
-       (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
-       (compilation-mode)
-       (beginning-of-buffer)
+       (setq compile_command (read-string "Shell Command: "))
+       (get-buffer-create output-buffer)
+       (get-buffer-create error-buffer)
+       (kill-buffer output-buffer-name)
+       ;;    (shell-command s_command output-buffer error-buffer)
+       (switch-to-buffer-other-window output-buffer)
+       (with-current-buffer output-buffer
+	 (read-only-mode -1)
+	 (kill-region (point-min) (point-max))
+	 (insert "Process Begins !!!!\n")
+	 (insert (format-time-string "%F %H:%M:%S(%3N)"))
+	 (insert "\n=====================================\n\n")
+	 (let* ((command_result (shell-command-to-string compile_command)))
+	   (insert (decode-coding-string command_result 'gbk)))
+	 (insert "\n=====================================\n")
+	 (insert "Process Finished !!!!\n")
+	 (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
+	 (compilation-mode)
+	 (beginning-of-buffer)
+	 )
+       ;; back to previous window
+       (other-window -1)
        )
-     ;; back to previous window
-     (other-window -1)
      )
-   )
 
- (defun ykdu-shell-command ()
-   (interactive)
-   (let (
-         (bf-name (buffer-file-name))
-         (output-buffer-name "*ykdu-shell*")
-         )
+   (defun ykdu-shell-command ()
+     (interactive)
      (let (
-           (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
-           )
-       (ykdu-command output-buffer-name)
+	   (bf-name (buffer-file-name))
+	   (output-buffer-name "*ykdu-shell*")
+	   )
+       (let (
+	     (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
+	     )
+	 (ykdu-command output-buffer-name)
+	 )
        )
      )
-   )
 
- ;; (defun workspace-coding-set (coding)
- ;;   (interactive "zCoding: ")
- ;;   "set defualt coding systems and prefer coding system at once"
- ;;   (set-default-coding-systems coding)
- ;;   ;; (locale-coding-system coding)
- ;;   (prefer-coding-system coding)
- ;;   )
+   ;; (defun workspace-coding-set (coding)
+   ;;   (interactive "zCoding: ")
+   ;;   "set defualt coding systems and prefer coding system at once"
+   ;;   (set-default-coding-systems coding)
+   ;;   ;; (locale-coding-system coding)
+   ;;   (prefer-coding-system coding)
+   ;;   )
 
- (defun open-fold (path)
-   "update for mf client"
-   (interactive "Dstart from: ")
-   (message (concat "start \"" path "\""))
-   (browse-url-of-file path)
-   )
+   (defun open-fold (path)
+     "update for mf client"
+     (interactive "Dstart from: ")
+     (message (concat "start \"" path "\""))
+     (browse-url-of-file path)
+     )
 
- (defun save-dir-path (path)
-   (interactive "Dcopy: ")
-   ;; (message (concat "start " path))
-   (kill-new path)
-   )
+   (defun save-dir-path (path)
+     (interactive "Dcopy: ")
+     ;; (message (concat "start " path))
+     (kill-new path)
+     )
 
- (defun copy-cur-dir-path (path)
-   (interactive "Dcopy from: ")
-   ;; (message (concat "start " path))
-   (kill-new path)
-   )
+   (defun copy-cur-dir-path (path)
+     (interactive "Dcopy from: ")
+     ;; (message (concat "start " path))
+     (kill-new path)
+     )
 
- (defun store-cur-file-name ()
-   (interactive)
-   (kill-new (file-name-nondirectory buffer-file-name))
-   )
+   (defun store-cur-file-name ()
+     (interactive)
+     (kill-new (file-name-nondirectory buffer-file-name))
+     )
 
- (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log" "--type-add nut:*.nut -t nut" "--type-add gnut:*.gnut -t gnut"))
+   (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log" "--type-add nut:*.nut -t nut" "--type-add gnut:*.gnut -t gnut"))
 
- (defun rg-thing-at-point-default (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (ripgrep-regexp search-term default-directory rg-ykuun-args)
-   )
-
- (defun rg-thing-at-point (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "Ripgrep %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (if (projectile-project-root)
-       (progn
-         (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
-         )
-     (message "default root do ripgrep")
+   (defun rg-thing-at-point-default (search-term &optional arg)
+     (interactive
+      (list
+       (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
+				     (if current-prefix-arg
+					 "regexp "
+				       ""))
+			     (projectile-symbol-or-selection-at-point))
+       current-prefix-arg))
      (ripgrep-regexp search-term default-directory rg-ykuun-args)
      )
-   )
 
- (require 'projectile)			; add this line to enable projectile-symbol-or-selection-at-point function
+   (defun rg-thing-at-point (search-term &optional arg)
+     (interactive
+      (list
+       (read-from-minibuffer (format "Ripgrep %ssearch for: "
+				     (if current-prefix-arg
+					 "regexp "
+				       ""))
+			     (projectile-symbol-or-selection-at-point))
+       current-prefix-arg))
+     (if (projectile-project-root)
+	 (progn
+	   (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
+	   )
+       (message "default root do ripgrep")
+       (ripgrep-regexp search-term default-directory rg-ykuun-args)
+       )
+     )
 
- (defun xref-find-apropos-at-point (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "xref find apropos %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (xref-find-apropos search-term)
-   )
+   (defun xref-find-apropos-at-point (search-term &optional arg)
+     (interactive
+      (list
+       (read-from-minibuffer (format "xref find apropos %ssearch for: "
+				     (if current-prefix-arg
+					 "regexp "
+				       ""))
+			     (projectile-symbol-or-selection-at-point))
+       current-prefix-arg))
+     (xref-find-apropos search-term)
+     )
 
- ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
- ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
- ;;   (message (concat current-root-dir "/"))
- ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
- ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
- ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
- ;;   )
+   ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
+   ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
+   ;;   (message (concat current-root-dir "/"))
+   ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
+   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
+   ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
+   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
+   ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
+   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
+   ;;   )
  #+END_SRC
 * recentf
 #+BEGIN_SRC emacs-lisp
@@ -287,13 +288,17 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 * pyim
   #+BEGIN_SRC emacs-lisp
   ;; input method
-  (require 'pyim)
 
+  
+  (when (require 'pyim nil 'noerror)
+  (progn
   (pyim-basedict-enable)
   (setq default-input-method "pyim")
   (setq pyim-default-scheme 'microsoft-shuangpin)
   (setq pyim-page-tooltip 'popup)
-  (setq pyim-page-length 9)
+  (setq pyim-page-length 9) 
+  )
+  )
   #+END_SRC
 * color
   #+BEGIN_SRC emacs-lisp
@@ -344,6 +349,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 
 (org-indent-mode)
 (org-display-inline-images t t)
+
 (setq org-todo-keywords
       '((sequence "TODO" "DOING" "ARCHIVE" "|" "DONE" "ABORT" "SUSPENDED")))
 (setq org-agenda-inhibit-startup t)
@@ -389,23 +395,39 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
 * lsp mode
+
 #+BEGIN_SRC emacs-lisp
 ;; (require 'lsp)
-;; (require 'lsp-ui)
 ;; (require 'lsp-clangd)
 
-;; (add-hook 'c++-mode-hook 'lsp)
-;; (add-hook 'c-mode-hook 'lsp)
-;; ;; (setq lsp-clients-clangd-executable "D:/workspace/thirdparty bin/llvm-project/build/Release/bin/clangd.exe")
+(add-hook 'c++-mode-hook 'lsp)
+(add-hook 'c-mode-hook 'lsp)
+
 ;; (require 'ccls)
 ;; (add-hook 'c++-mode-hook (lambda () (require 'ccls) (lsp)))
 ;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
 
-;; (setq-default lsp-file-watch-threshold 200000)
-;; (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+(functionp 'json-serialize)
+(setq lsp-clients-clangd-args '("-j=8" "-background-index" "-log=error"))
+(setq gc-cons-threshold (* 1024 1024))
+(setq read-process-output-max (* 8 1024 1024)) ;; 8MB
+(setq lsp-file-watch-threshold nil)
+(setq lsp-idle-delay 1.0)
+(setq lsp-enable-file-watchers nil)
+(setq lsp-log-io nil)
+(setq lsp-print-performance t)
+(setq lsp-keep-workspace-alive t)
+(setq lsp-enable-indentation t)
+(setq lsp-enable-xref t)
+(setq lsp-enable-completion-at-point t)
+(setq lsp-response-timeout 5)
+(setq lsp-diagnostic-package :none)
 #+END_SRC
-* company                                                                     :DEPRECATED:
+* company
   #+BEGIN_SRC emacs-lisp
+  (setq 
+   company-minimum-prefix-length 1
+   company-idle-delay 0.0)
   ;; (require 'company-lsp)
   ;; (push 'company-lsp company-backends)
   ;; (push 'company-c-headers company-backends)
@@ -438,18 +460,20 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 ;; (require 'ivy-xref)
 ;; (require 'ivy-explorer)
 
-(ivy-mode t)
+(require 'ivy)
+(eval-after-load 'ivy
+  '(ivy-mode t)
+)
+
 ;; (counsel-mode t)
 ;; (ivy-explorer-mode t)
 
 (setq ivy-use-virtual-buffers t)
-
 (when (>= emacs-major-version 27)
   (setq xref-show-definitions-function #'ivy-xref-show-defs))
 (setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
 
 ;; function
-
 (defun resume-ivy-with-prefix-arg ()
   (interactive)
   (setq current-prefix-arg '(4))		; C-u prefix command
@@ -459,7 +483,6 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (progn
   (global-set-key (kbd "C-c i") 'ivy-command-prefix)
   (define-prefix-command 'ivy-command-prefix)
-
   (define-key ivy-command-prefix (kbd "s") 'swiper-isearch-thing-at-point)
   (define-key ivy-command-prefix (kbd "r") 'counsel-recentf)
   (define-key ivy-command-prefix (kbd "i") 'counsel-imenu)
@@ -469,7 +492,9 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+END_SRC
 * projectile
 #+BEGIN_SRC emacs-lisp
-;; (projectile-mode t)
+(add-hook 'c++-mode-hook (projectile-mode t))
+(add-hook 'c-mode-hook (projectile-mode t))
+
 (setq projectile-indexing-method 'native)
 (setq projectile-enable-caching t)
 (setq projectile-require-project-root nil)
@@ -488,7 +513,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 * Async Shell
   #+BEGIN_SRC emacs-lisp
   (add-to-list 'display-buffer-alist
-			   (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
+               (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
   #+END_SRC
 * Code Navigation
 #+BEGIN_SRC emacs-lisp
