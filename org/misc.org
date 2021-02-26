@@ -66,6 +66,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
   (setq buffer-file-coding-system 'utf-8)
   (setq make-backup-files nil)
   (setq create-lockfiles nil)
+  (set-fill-column 120)
 
   ;; disable annoying beeeeep !!!
   (setq visible-bell nil ring-bell-function (lambda ()))
@@ -200,7 +201,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
    (kill-new (file-name-nondirectory buffer-file-name))
    )
 
- (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json"))
+ (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log" "--type-add nut:*.nut -t nut" "--type-add gnut:*.gnut -t gnut"))
 
  (defun rg-thing-at-point-default (search-term &optional arg)
    (interactive
@@ -408,7 +409,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
         ("l" "DO IT WHILE ALIVE" entry (file+headline "life.org" "LIFE MOVES ON")
          "* PLAN %?\n %a\n %T\n %i\n")
         ("D" "Work Daily Recording" entry (file+datetree org-work-daily "Daily Records")
-         "* %?\n %i\n %a" :tree-type week)
+         "* 工作日简报%?\n %i\n %a" :tree-type week)
         ("T" "Work TAPD Recording" entry (file+olp+datetree org-work-daily "TAPD Records")
          "* %?\n %i\n %a" :tree-type week)
         ("i" "Incoming Works" entry (file+headline org-incomming-work "Looks Good To Me!!!!")
@@ -597,6 +598,18 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+BEGIN_SRC emacs-lisp
 ;; (defalias 'xref-find-definitions 'counsel-etags-find-tag-at-point)
 ;; (defalias 'xref-find-apropos-at-point 'counsel-etags-grep)
+#+END_SRC
+* Origami
+#+BEGIN_SRC emacs-lisp
+;; (require 'origami)
+;; (global-origami-mode t)
+;;  (progn
+;;    (global-set-key [C-tab] 'origami-toggle-node)
+
+;;    (define-key origami-mode-map (kbd "C-c f c") 'origami-close-node-recursively) 
+;;    (define-key origami-mode-map (kbd "C-c f o") 'origami-open-node-recursively)
+;;    (define-key origami-mode-map (kbd "C-c f t") 'origami-close-node-recursively)
+;;    )
 #+END_SRC
 * Appendix
   #+BEGIN_SRC shell
