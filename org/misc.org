@@ -269,35 +269,50 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
   (define-coding-system-alias 'utf8 'utf-8-unix)
   #+END_SRC
 * version control
-  #+BEGIN_SRC emacs-lisp
-  (remove-hook 'find-file-hook 'vc-refresh-state)
-  ;; (setq jit-lock-defer-time 0.01)
-  ;; (setq font-lock-support-mode 'fast-lock-mode)
-  ;; magit receiving gbk from git.exe
-  (setq magit-git-output-coding-system 'utf-8)
-  ;; (setq magit-git-output-coding-system 'chinese-gbk)
-  ;; 强制设置commit editmsg的编码
-  (modify-coding-system-alist 'file "\.git/COMMIT_EDITMSG" 'utf-8)
-  (global-set-key (kbd "C-x g") 'magit-status)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(remove-hook 'find-file-hook 'vc-refresh-state)
+(remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
+;; (setq jit-lock-defer-time 0.01)
+;; (setq font-lock-support-mode 'fast-lock-mode)
+;; magit receiving gbk from git.exe
+(setq magit-git-output-coding-system 'utf-8)
+;; (setq magit-git-output-coding-system 'chinese-gbk)
+;; 强制设置commit editmsg的编码
+(modify-coding-system-alist 'file "\.git/COMMIT_EDITMSG" 'utf-8)
+(global-set-key (kbd "C-x g") 'magit-status)
+
+;; performance improve
+(setq magit-commit-show-diff nil)
+(setq magit-refresh-status-buffer nil)
+(setq magit-revision-insert-related-refs nil)
+(setq magit-diff-highlight-indentation nil)
+(setq magit-diff-highlight-trailing nil)
+(setq magit-diff-paint-whitespace nil)
+(setq magit-diff-highlight-hunk-body nil)
+(setq magit-diff-refine-hunk nil)
+#+END_SRC
 * optimization
   #+BEGIN_SRC emacs-lisp
   ;; chinese character is using a big font lib which will trigger the GC on every movement
   (setq inhibit-compacting-font-caches t)
   #+END_SRC
 * pyim
-  #+BEGIN_SRC emacs-lisp
-  ;; input method
+#+BEGIN_SRC emacs-lisp
+;; input method
 
-  
-  (when (require 'pyim nil 'noerror)
+(when (require 'pyim nil 'noerror)
   (progn
-  (pyim-basedict-enable)
-  (setq default-input-method "pyim")
-  (setq pyim-default-scheme 'microsoft-shuangpin)
-  (setq pyim-page-tooltip 'popup)
-  (setq pyim-page-length 9) 
+	(setq default-input-method "pyim")
+	(setq pyim-default-scheme 'microsoft-shuangpin)
+	(setq pyim-page-tooltip 'popup)
+	(setq pyim-page-length 9) 
+  (setq pyim-punctuation-translate-p '(no yes auto))
+	)
   )
+(when (require 'pyim-basedict nil 'noerror)
+  (progn
+	(pyim-basedict-enable)
+	)
   )
   #+END_SRC
 * color
@@ -408,7 +423,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 ;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
 
 (functionp 'json-serialize)
-(setq lsp-clients-clangd-args '("-j=8" "-background-index" "-log=error"))
+(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
 (setq gc-cons-threshold (* 1024 1024))
 (setq read-process-output-max (* 8 1024 1024)) ;; 8MB
 (setq lsp-file-watch-threshold nil)
@@ -461,13 +476,17 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 ;; (require 'ivy-explorer)
 
 (require 'ivy)
+
 (eval-after-load 'ivy
-  '(ivy-mode t)
+  '(progn 
+	 (ivy-mode t)
+	 (ivy-explorer-mode t)
+	 )
+  )
+
+(eval-after-load 'counsel
+  '(counsel-mode t)
 )
-
-;; (counsel-mode t)
-;; (ivy-explorer-mode t)
-
 (setq ivy-use-virtual-buffers t)
 (when (>= emacs-major-version 27)
   (setq xref-show-definitions-function #'ivy-xref-show-defs))
@@ -488,8 +507,8 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
   (define-key ivy-command-prefix (kbd "i") 'counsel-imenu)
   (define-key ivy-command-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
   )
-
 #+END_SRC
+
 * projectile
 #+BEGIN_SRC emacs-lisp
 (add-hook 'c++-mode-hook (projectile-mode t))

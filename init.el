@@ -11,9 +11,10 @@
    '("13a8eaddb003fd0d561096e11e1a91b029d3c9d64554f8e897b2513dbf14b277" default))
  '(global-font-lock-mode t)
  '(global-linum-mode nil)
- '(gnutls-algorithm-priority "normal:-vers-tls1.3" t)
+ '(gnutls-algorithm-priority "normal:-vers-tls1.3")
+ '(org-agenda-files '("d:/workspace/NotesDoMatter/Plans/WeeklyToDo.org"))
  '(package-selected-packages
-   '(gnu-elpa-keyring-update company-lsp counsel-gtags csharp-mode clang-format company-c-headers eldoc-eval eldoc c-eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org ivy-xref counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region ido-at-point yasnippet projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server cmake-mode magit markdown-mode)))
+   '(lsp-treemacs pyim-basedict gnu-elpa-keyring-update company-lsp csharp-mode clang-format company-c-headers eldoc-eval eldoc c-eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org ivy-xref counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region ido-at-point yasnippet projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server cmake-mode magit markdown-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
