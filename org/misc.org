@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 #+TAGS: DEPRECATED
 
-* manual
+* Manual
 ** 安装当前所有选中的package
    1. pacakge-install-selected-packages
 ** 其中需要安装服务器的有
    1. (Python)jedi:install-server
 ** 配置环境变量
-   1. ORG_ROOT 指向目前使用的org目录，所有org capture的内容都会添加到这个目录下面
-   2. ORG_WORK_ROOT 指向当前工作相关的org目录
+   1. OPTIONAL ORG_ROOT 指向目前使用的org目录，所有org capture的内容都会添加到这个目录下面
+   2. OPTIONAL ORG_WORK_ROOT 指向当前工作相关的org目录
 ** 需要注意的是
    当init.el中的，selected-package变量的值可能不能正确的表达，这不分可能需要手动的处理
 ** UnrealEngine
@@ -19,212 +19,52 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 ** LINKS
 [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][EmacsWiki: Optimizing Emacs Startup]]
 [[https://emacs-lsp.github.io/lsp-mode/page/performance/][Performance - LSP Mode - LSP support for Emacs]]
-* misc configs
-  #+BEGIN_SRC emacs-lisp
-  (defalias 'yes-or-no-p 'y-or-n-p)
 
-  (setq
-   large-file-warning-threshold 1000000
-   scroll-conservatively 10
-   scroll-margin 7
-   )
+* Emacs Configuration
+** Common
+#+BEGIN_SRC emacs-lisp
+(defalias 'yes-or-no-p 'y-or-n-p)
 
+(setq
+ large-file-warning-threshold 1000000
+ scroll-conservatively 10
+ scroll-margin 7
+ buffer-file-coding-system 'utf-8
+ make-backup-files nil
+ create-lockfiles nil
+)
+
+(set-fill-column 140)
+
+(when (display-graphic-p)
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-  (setq buffer-file-coding-system 'utf-8)
-  (setq make-backup-files nil)
-  (setq create-lockfiles nil)
-  (set-fill-column 120)
-
-  ;; disable annoying beeeeep !!!
-  (setq visible-bell nil ring-bell-function (lambda ()))
-  #+END_SRC
-* modes
-  #+BEGIN_SRC emacs-lisp
   (tool-bar-mode 0)
   (menu-bar-mode 0)
   (toggle-scroll-bar 0)
-  (line-number-mode)
-  (column-number-mode)
-  (global-visual-line-mode 0)
-  (global-linum-mode 0)
+  )
 
-  ;; 让一些插件可以支持语法相关的内容
-  (semantic-mode t)
+(line-number-mode)
+(column-number-mode)
+(global-visual-line-mode 0)
+(global-linum-mode 0)
+;; 让一些插件可以支持语法相关的内容
+(semantic-mode t)
+
+;; disable annoying beeeeep !!!
+(setq visible-bell nil ring-bell-function (lambda ()))
+#+END_SRC
+** Encoding
+#+BEGIN_SRC emacs-lisp
+(define-coding-system-alias 'GB18030 'gb18030)
+(define-coding-system-alias 'utf8 'utf-8-unix)
+#+END_SRC
+** Optimization
+  #+BEGIN_SRC emacs-lisp
+  ;; chinese character is using a big font lib which will trigger the GC on every movement
+  (setq inhibit-compacting-font-caches t)
   #+END_SRC
-* key binding
- #+BEGIN_SRC emacs-lisp
- ;; personal short-cuts
- ;; (global-set-key (kbd "<f4>") 'flycheck-mode)
- (global-set-key (kbd "<f9>") 'ykdu-shell-command)
-
- (global-set-key (kbd "M-p") 'backward-paragraph)
- (global-set-key (kbd "M-n") 'forward-paragraph)
- (global-set-key (kbd "C-o") 'newline-and-indent)
-
- (progn
-   (global-set-key (kbd "C-c k") 'key-command-prefix)
-   (define-prefix-command 'key-command-prefix)
-
-   (define-key key-command-prefix (kbd "j") 'windmove-down)
-   (define-key key-command-prefix (kbd "k") 'windmove-up)
-   (define-key key-command-prefix (kbd "h") 'windmove-left)
-   (define-key key-command-prefix (kbd "l") 'windmove-right)
-   )
-
- (progn
-   (global-set-key (kbd "C-;") 'ykdu-major-map)
-   (define-prefix-command 'ykdu-major-map)
-
-   (define-key ykdu-major-map (kbd "f") 'find-name-dired)
-   (define-key ykdu-major-map (kbd "F") 'projectile-find-file)
-   (define-key ykdu-major-map (kbd "g") 'rg-thing-at-point)
-   (define-key ykdu-major-map (kbd "G") 'rg-thing-at-point-default)
-
-   ;; (define-key ykdu-major-map (kbd "1") 'flycheck-list-errors)
-
-   (define-key ykdu-major-map (kbd "e") 'open-fold)
-   (define-key ykdu-major-map (kbd "b") 'pop-tag-mark)
-
-   (define-key ykdu-major-map (kbd "s") 'store-cur-file-name)
-   )
-
- (global-set-key (kbd "C-M-.") 'xref-find-apropos-at-point)
- #+END_SRC
-* function
- #+BEGIN_SRC emacs-lisp
-   (defun ykdu-command (command-buffer)
-     "Run shell command and output to given buffer"
-     (let* ((output-buffer command-buffer)
-	    (error-buffer output-buffer))
-
-       (setq compile_command (read-string "Shell Command: "))
-       (get-buffer-create output-buffer)
-       (get-buffer-create error-buffer)
-       (kill-buffer output-buffer-name)
-       ;;    (shell-command s_command output-buffer error-buffer)
-       (switch-to-buffer-other-window output-buffer)
-       (with-current-buffer output-buffer
-	 (read-only-mode -1)
-	 (kill-region (point-min) (point-max))
-	 (insert "Process Begins !!!!\n")
-	 (insert (format-time-string "%F %H:%M:%S(%3N)"))
-	 (insert "\n=====================================\n\n")
-	 (let* ((command_result (shell-command-to-string compile_command)))
-	   (insert (decode-coding-string command_result 'gbk)))
-	 (insert "\n=====================================\n")
-	 (insert "Process Finished !!!!\n")
-	 (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
-	 (compilation-mode)
-	 (beginning-of-buffer)
-	 )
-       ;; back to previous window
-       (other-window -1)
-       )
-     )
-
-   (defun ykdu-shell-command ()
-     (interactive)
-     (let (
-	   (bf-name (buffer-file-name))
-	   (output-buffer-name "*ykdu-shell*")
-	   )
-       (let (
-	     (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
-	     )
-	 (ykdu-command output-buffer-name)
-	 )
-       )
-     )
-
-   ;; (defun workspace-coding-set (coding)
-   ;;   (interactive "zCoding: ")
-   ;;   "set defualt coding systems and prefer coding system at once"
-   ;;   (set-default-coding-systems coding)
-   ;;   ;; (locale-coding-system coding)
-   ;;   (prefer-coding-system coding)
-   ;;   )
-
-   (defun open-fold (path)
-     "update for mf client"
-     (interactive "Dstart from: ")
-     (message (concat "start \"" path "\""))
-     (browse-url-of-file path)
-     )
-
-   (defun save-dir-path (path)
-     (interactive "Dcopy: ")
-     ;; (message (concat "start " path))
-     (kill-new path)
-     )
-
-   (defun copy-cur-dir-path (path)
-     (interactive "Dcopy from: ")
-     ;; (message (concat "start " path))
-     (kill-new path)
-     )
-
-   (defun store-cur-file-name ()
-     (interactive)
-     (kill-new (file-name-nondirectory buffer-file-name))
-     )
-
-   (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log" "--type-add nut:*.nut -t nut" "--type-add gnut:*.gnut -t gnut"))
-
-   (defun rg-thing-at-point-default (search-term &optional arg)
-     (interactive
-      (list
-       (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
-				     (if current-prefix-arg
-					 "regexp "
-				       ""))
-			     (projectile-symbol-or-selection-at-point))
-       current-prefix-arg))
-     (ripgrep-regexp search-term default-directory rg-ykuun-args)
-     )
-
-   (defun rg-thing-at-point (search-term &optional arg)
-     (interactive
-      (list
-       (read-from-minibuffer (format "Ripgrep %ssearch for: "
-				     (if current-prefix-arg
-					 "regexp "
-				       ""))
-			     (projectile-symbol-or-selection-at-point))
-       current-prefix-arg))
-     (if (projectile-project-root)
-	 (progn
-	   (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
-	   )
-       (message "default root do ripgrep")
-       (ripgrep-regexp search-term default-directory rg-ykuun-args)
-       )
-     )
-
-   (defun xref-find-apropos-at-point (search-term &optional arg)
-     (interactive
-      (list
-       (read-from-minibuffer (format "xref find apropos %ssearch for: "
-				     (if current-prefix-arg
-					 "regexp "
-				       ""))
-			     (projectile-symbol-or-selection-at-point))
-       current-prefix-arg))
-     (xref-find-apropos search-term)
-     )
-
-   ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
-   ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
-   ;;   (message (concat current-root-dir "/"))
-   ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
-   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
-   ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
-   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
-   ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
-   ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
-   ;;   )
- #+END_SRC
-* recentf
+** Recentf
 #+BEGIN_SRC emacs-lisp
 (recentf-mode t)
 (setq
@@ -232,7 +72,161 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
  recentf-max-saved-items nil
  )
 #+END_SRC
-* C\CPP
+
+** Color Theme
+ #+BEGIN_SRC emacs-lisp
+ (load-theme 'tango-dark t)
+ (require 'highlight-indentation)
+ ;; (set-face-background 'highlight-indentation-face "#e3e3d3")
+ ;; (set-face-background 'highlight-indentation-current-column-face "#c3b3b3")
+ #+END_SRC
+
+** Grep
+#+BEGIN_SRC emacs-lisp
+(setq grep-command "rg --vimgrep -i -t cpp -t lua -t cs -t c -t config -t txt ")
+#+END_SRC
+
+** Async Shell
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'display-buffer-alist
+             (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
+#+END_SRC
+
+* Function Defines
+ #+BEGIN_SRC emacs-lisp
+ (defun ykdu-command (command-buffer)
+   "Run shell command and output to given buffer"
+   (let* ((output-buffer command-buffer)
+          (error-buffer output-buffer))
+
+     (setq compile_command (read-string "Shell Command: "))
+     (get-buffer-create output-buffer)
+     (get-buffer-create error-buffer)
+     (kill-buffer output-buffer-name)
+     ;;    (shell-command s_command output-buffer error-buffer)
+     (switch-to-buffer-other-window output-buffer)
+     (with-current-buffer output-buffer
+       (read-only-mode -1)
+       (kill-region (point-min) (point-max))
+       (insert "Process Begins !!!!\n")
+       (insert (format-time-string "%F %H:%M:%S(%3N)"))
+       (insert "\n=====================================\n\n")
+       (let* ((command_result (shell-command-to-string compile_command)))
+         (insert (decode-coding-string command_result 'gbk)))
+       (insert "\n=====================================\n")
+       (insert "Process Finished !!!!\n")
+       (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
+       (compilation-mode)
+       (beginning-of-buffer)
+       )
+     ;; back to previous window
+     (other-window -1)
+     )
+   )
+
+ (defun ykdu-shell-command ()
+   (interactive)
+   (let (
+         (bf-name (buffer-file-name))
+         (output-buffer-name "*ykdu-shell*")
+         )
+     (let (
+           (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
+           )
+       (ykdu-command output-buffer-name)
+       )
+     )
+   )
+
+ ;; (defun workspace-coding-set (coding)
+ ;;   (interactive "zCoding: ")
+ ;;   "set defualt coding systems and prefer coding system at once"
+ ;;   (set-default-coding-systems coding)
+ ;;   ;; (locale-coding-system coding)
+ ;;   (prefer-coding-system coding)
+ ;;   )
+
+ (defun open-fold (path)
+   "update for mf client"
+   (interactive "Dstart from: ")
+   (message (concat "start \"" path "\""))
+   (browse-url-of-file path)
+   )
+
+ (defun save-dir-path (path)
+   (interactive "Dcopy: ")
+   ;; (message (concat "start " path))
+   (kill-new path)
+   )
+
+ (defun copy-cur-dir-path (path)
+   (interactive "Dcopy from: ")
+   ;; (message (concat "start " path))
+   (kill-new path)
+   )
+
+ (defun store-cur-file-name ()
+   (interactive)
+   (kill-new (file-name-nondirectory buffer-file-name))
+   )
+
+ (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log"))
+
+ (defun rg-thing-at-point-default (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (ripgrep-regexp search-term default-directory rg-ykuun-args)
+   )
+
+ (defun rg-thing-at-point (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "Ripgrep %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (if (projectile-project-root)
+       (progn
+         (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
+         )
+     (message "default root do ripgrep")
+     (ripgrep-regexp search-term default-directory rg-ykuun-args)
+     )
+   )
+
+ (defun xref-find-apropos-at-point (search-term &optional arg)
+   (interactive
+    (list
+     (read-from-minibuffer (format "xref find apropos %ssearch for: "
+                                   (if current-prefix-arg
+                                       "regexp "
+                                     ""))
+                           (projectile-symbol-or-selection-at-point))
+     current-prefix-arg))
+   (xref-find-apropos search-term)
+   )
+
+ ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
+ ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
+ ;;   (message (concat current-root-dir "/"))
+ ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
+ ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
+ ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
+ ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
+ ;;   )
+ #+END_SRC
+* Programming Language
+** C\CPP
 #+BEGIN_SRC emacs-lisp
 (setq-default c++-tab-always-indent t)
 (setq-default c-default-style "awk")
@@ -240,73 +234,42 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq-default c-indent-level 4)
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode t)
-
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-
-;; (c-set-offset 'cpp-macro -1000)
-;; (c-set-offset 'case-label 4)
-;; (c-set-offset 'substatement-open 0)
-;; (c-set-offset 'substatement-close 0)
-;; (c-set-offset 'label 0)
-;; (c-set-offset 'arglist-intro 4)
-;; (c-set-offset 'statement-block-intro 4)
-;; (c-set-offset 'arglist-close 4)
-;; (c-set-offset 'statement-cont 0)
-;; (c-set-offset 'label 0)
 #+END_SRC
-* Lua
-  #+BEGIN_SRC emacs-lisp
-  (setq-default lua-indent-level 4)
-  #+END_SRC
-* Python
-  #+BEGIN_SRC emacs-lisp
-  ;; Python
-  (setq-default python-indent-offset 4)
-  #+END_SRC
-* encoding
-  #+BEGIN_SRC emacs-lisp
-  (define-coding-system-alias 'GB18030 'gb18030)
-  (define-coding-system-alias 'utf8 'utf-8-unix)
-  #+END_SRC
-* version control
+** Lua
+#+BEGIN_SRC emacs-lisp
+(setq-default lua-indent-level 4)
+#+END_SRC
+** Python
+#+BEGIN_SRC emacs-lisp
+(setq-default python-indent-offset 4)
+#+END_SRC
+
+* Version Control
 #+BEGIN_SRC emacs-lisp
 (remove-hook 'find-file-hook 'vc-refresh-state)
-(remove-hook 'magit-refs-sections-hook 'magit-insert-tags)
-;; (setq jit-lock-defer-time 0.01)
-;; (setq font-lock-support-mode 'fast-lock-mode)
+(setq jit-lock-defer-time 0.01)
 ;; magit receiving gbk from git.exe
+#+END_SRC
+** Magit
+#+BEGIN_SRC emacs-lisp
 (setq magit-git-output-coding-system 'utf-8)
 ;; (setq magit-git-output-coding-system 'chinese-gbk)
 ;; 强制设置commit editmsg的编码
 (modify-coding-system-alist 'file "\.git/COMMIT_EDITMSG" 'utf-8)
-(global-set-key (kbd "C-x g") 'magit-status)
-
-;; performance improve
-(setq magit-commit-show-diff nil)
-(setq magit-refresh-status-buffer nil)
-(setq magit-revision-insert-related-refs nil)
-(setq magit-diff-highlight-indentation nil)
-(setq magit-diff-highlight-trailing nil)
-(setq magit-diff-paint-whitespace nil)
-(setq magit-diff-highlight-hunk-body nil)
-(setq magit-diff-refine-hunk nil)
 #+END_SRC
-* optimization
-  #+BEGIN_SRC emacs-lisp
-  ;; chinese character is using a big font lib which will trigger the GC on every movement
-  (setq inhibit-compacting-font-caches t)
-  #+END_SRC
-* pyim
+
+* Input Method
+** Pyim
 #+BEGIN_SRC emacs-lisp
 ;; input method
-
 (when (require 'pyim nil 'noerror)
   (progn
 	(setq default-input-method "pyim")
 	(setq pyim-default-scheme 'microsoft-shuangpin)
 	(setq pyim-page-tooltip 'popup)
 	(setq pyim-page-length 9) 
-  (setq pyim-punctuation-translate-p '(no yes auto))
+	(setq pyim-punctuation-translate-p '(no yes auto))
 	)
   )
 (when (require 'pyim-basedict nil 'noerror)
@@ -314,19 +277,9 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 	(pyim-basedict-enable)
 	)
   )
-  #+END_SRC
-* color
-  #+BEGIN_SRC emacs-lisp
-  (load-theme 'tango-dark t)
-  (require 'highlight-indentation)
-  ;; (set-face-background 'highlight-indentation-face "#e3e3d3")
-  ;; (set-face-background 'highlight-indentation-current-column-face "#c3b3b3")
-  #+END_SRC
-* grep
-#+BEGIN_SRC emacs-lisp
-(setq grep-command "rg --vimgrep -i -t cpp -t lua -t cs -t c -t config -t txt ")
 #+END_SRC
-* org mode
+
+* Org mode
 #+BEGIN_SRC emacs-lisp
 (setq
  org-agenda-files nil
@@ -356,11 +309,6 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
    (shell . t)
    ;; (C . t)
    ))
-
-;; (setq 
-;;  org-babel-C++-compiler "clang++"
-;;  org-babel-C-compiler "clang"
-;;  )
 
 (org-indent-mode)
 (org-display-inline-images t t)
@@ -402,30 +350,15 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
          "* TODO %?\n %a\n %T\n %i\n")
         )
       )
-
-;; KEY BINDING
-(global-set-key (kbd "C-c l") 'org-store-link)
-(global-set-key (kbd "C-c C-l") 'org-insert-link)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
 #+END_SRC
-* lsp mode
-
+* LSP Mode
 #+BEGIN_SRC emacs-lisp
-;; (require 'lsp)
-;; (require 'lsp-clangd)
-
 (add-hook 'c++-mode-hook 'lsp)
 (add-hook 'c-mode-hook 'lsp)
-
-;; (require 'ccls)
-;; (add-hook 'c++-mode-hook (lambda () (require 'ccls) (lsp)))
-;; (add-hook 'c-mode-hook (lambda () (require 'ccls) (lsp)))
-
 (functionp 'json-serialize)
 (setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
 (setq gc-cons-threshold (* 1024 1024))
-(setq read-process-output-max (* 8 1024 1024)) ;; 8MB
+(setq read-process-output-max (* 128 1024 1024))
 (setq lsp-file-watch-threshold nil)
 (setq lsp-idle-delay 1.0)
 (setq lsp-enable-file-watchers nil)
@@ -439,50 +372,23 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq lsp-diagnostic-package :none)
 #+END_SRC
 * company
-  #+BEGIN_SRC emacs-lisp
-  (setq 
-   company-minimum-prefix-length 1
-   company-idle-delay 0.0)
-  ;; (require 'company-lsp)
-  ;; (push 'company-lsp company-backends)
-  ;; (push 'company-c-headers company-backends)
-
-  ;; (global-company-mode 0)
-
-  ;; (eval-after-load 'company
-  ;;   '(add-to-list 'company-backends 'company-irony))
-
-  ;; (require 'company-irony-c-headers)
-  ;; ;; Load with `irony-mode` as a grouped backend
-  ;; (eval-after-load 'company
-  ;;   '(add-to-list
-  ;;     'company-backends '(company-irony-c-headers company-irony)))
-
-  ;; ;; 安装完成jedi之后需要pip安装相关的包jedi以及epc，然后执行jedi:install-server
-  ;; ;; Advanced usage.
-  ;; (add-to-list 'company-backends '(company-jedi company-files))
-
-  ;; ;; key bindings,
-  ;; ;; (global-set-key (kbd "M-/") 'company-complete)
-  ;; (global-set-key (kbd "C-M-/") 'company-complete)
-  #+END_SRC
-* yasnippet
-  #+BEGIN_SRC emacs-lisp
-  ;; (yas-global-mode t)
-  #+END_SRC
-* ivy counsel swiper
 #+BEGIN_SRC emacs-lisp
-;; (require 'ivy-xref)
-;; (require 'ivy-explorer)
-
+(setq 
+ company-minimum-prefix-length 3
+ company-idle-delay 0.0)
+#+END_SRC
+* Yasnippet
+ #+BEGIN_SRC emacs-lisp
+ ;; (yas-global-mode t)
+ #+END_SRC
+* Ivy Counsel Swiper
+#+BEGIN_SRC emacs-lisp
 (require 'ivy)
-
 (eval-after-load 'ivy
-  '(progn 
-	 (ivy-mode t)
-	 (ivy-explorer-mode t)
-	 )
+  '(ivy-mode t)
   )
+;; (counsel-mode t)
+;; (ivy-explorer-mode t)
 
 (eval-after-load 'counsel
   '(counsel-mode t)
@@ -498,18 +404,8 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
   (setq current-prefix-arg '(4))		; C-u prefix command
   (ivy-resume)
   )
-
-(progn
-  (global-set-key (kbd "C-c i") 'ivy-command-prefix)
-  (define-prefix-command 'ivy-command-prefix)
-  (define-key ivy-command-prefix (kbd "s") 'swiper-isearch-thing-at-point)
-  (define-key ivy-command-prefix (kbd "r") 'counsel-recentf)
-  (define-key ivy-command-prefix (kbd "i") 'counsel-imenu)
-  (define-key ivy-command-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
-  )
 #+END_SRC
-
-* projectile
+* Projectile
 #+BEGIN_SRC emacs-lisp
 (add-hook 'c++-mode-hook (projectile-mode t))
 (add-hook 'c-mode-hook (projectile-mode t))
@@ -519,37 +415,55 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq projectile-require-project-root nil)
 (setq projectile-completion-system 'ivy)
 #+END_SRC
-* clang-format
-  #+BEGIN_SRC emacs-lisp
-  ;; (require 'clang-format)
-  #+END_SRC
-* expand region
-  [[https://github.com/magnars/expand-region.el][magnars/expand-region.el: Emacs extension to increase selected region by semantic units.]]
-  If you expand too far, you can contract the region by pressing - (minus key), or by prefixing the shortcut you defined with a negative argument: C-- C-=.
-  #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-=") 'er/expand-region)
-  #+END_SRC
-* Async Shell
-  #+BEGIN_SRC emacs-lisp
-  (add-to-list 'display-buffer-alist
-               (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer-no-window nil)))
-  #+END_SRC
+
 * Code Navigation
 #+BEGIN_SRC emacs-lisp
 ;; (defalias 'xref-find-definitions 'counsel-etags-find-tag-at-point)
 ;; (defalias 'xref-find-apropos-at-point 'counsel-etags-grep)
 #+END_SRC
-* Origami
-#+BEGIN_SRC emacs-lisp
-;; (require 'origami)
-;; (global-origami-mode t)
-;;  (progn
-;;    (global-set-key [C-tab] 'origami-toggle-node)
 
-;;    (define-key origami-mode-map (kbd "C-c f c") 'origami-close-node-recursively) 
-;;    (define-key origami-mode-map (kbd "C-c f o") 'origami-open-node-recursively)
-;;    (define-key origami-mode-map (kbd "C-c f t") 'origami-close-node-recursively)
-;;    )
+* key binding
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f9>") 'ykdu-shell-command)
+(global-set-key (kbd "M-p") 'backward-paragraph)
+(global-set-key (kbd "M-n") 'forward-paragraph)
+(global-set-key (kbd "C-o") 'newline-and-indent)
+
+(global-set-key (kbd "C-c j") 'shortcut-prefix)
+(global-set-key (kbd "C-c k") 'move-shortcut-prefix)
+
+(define-prefix-command 'move-shortcut-prefix)
+(define-key move-shortcut-prefix (kbd "j") 'windmove-down)
+(define-key move-shortcut-prefix (kbd "k") 'windmove-up)
+(define-key move-shortcut-prefix (kbd "h") 'windmove-left)
+(define-key move-shortcut-prefix (kbd "l") 'windmove-right)
+
+(define-prefix-command 'shortcut-prefix)
+(define-key shortcut-prefix (kbd "f") 'find-name-dired)
+(define-key shortcut-prefix (kbd "F") 'projectile-find-file)
+(define-key shortcut-prefix (kbd "g") 'rg-thing-at-point)
+(define-key shortcut-prefix (kbd "G") 'rg-thing-at-point-default)
+(define-key shortcut-prefix (kbd "e") 'open-fold)
+(define-key shortcut-prefix (kbd "b") 'pop-tag-mark)
+(define-key shortcut-prefix (kbd "m") 'magit-status)
+
+(define-key shortcut-prefix (kbd "l") 'org-store-link)
+(define-key shortcut-prefix (kbd "C-l") 'org-insert-link)
+(define-key shortcut-prefix (kbd "a") 'org-agenda)
+(define-key shortcut-prefix (kbd "c") 'org-capture)
+
+(define-key shortcut-prefix (kbd "s") 'swiper-isearch-thing-at-point)
+(define-key shortcut-prefix (kbd "r") 'counsel-recentf)
+(define-key shortcut-prefix (kbd "i") 'counsel-imenu)
+(define-key shortcut-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
+
+;; [[https://github.com/magnars/expand-region.el][magnars/expand-region.el: Emacs extension to increase ;; selected region by semantic units.]]
+;; If you expand too far, you can contract the region by pressing - (minus key), or by prefixing the ;; ;; shortcut you defined with a negative argument: C-- C-=.
+;;
+(define-key shortcut-prefix (kbd "=") 'er/expand-region)
+
+;; my define function map
+(define-key shortcut-prefix (kbd "1") 'store-cur-file-name)
 #+END_SRC
 * Appendix
   #+BEGIN_SRC shell
