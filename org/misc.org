@@ -356,7 +356,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (add-hook 'c++-mode-hook 'lsp)
 (add-hook 'c-mode-hook 'lsp)
 (functionp 'json-serialize)
-(setq lsp-clients-clangd-args '("-j=4" "-background-index" "-log=error"))
+(setq lsp-clients-clangd-args '("-j=6" "-background-index" "-log=error"))
 (setq gc-cons-threshold (* 1024 1024))
 (setq read-process-output-max (* 128 1024 1024))
 (setq lsp-file-watch-threshold nil)
@@ -371,32 +371,33 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq lsp-response-timeout 5)
 (setq lsp-diagnostic-package :none)
 #+END_SRC
-* company
+* Company
 #+BEGIN_SRC emacs-lisp
 (setq 
  company-minimum-prefix-length 3
- company-idle-delay 0.0)
+ company-idle-delay 0.1
+ company-backends '(company-capf company-dabbrev company-dabbrev-code company-elisp company-lua)
+)
 #+END_SRC
 * Yasnippet
- #+BEGIN_SRC emacs-lisp
- ;; (yas-global-mode t)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+(yas-global-mode t)
+#+END_SRC
 * Ivy Counsel Swiper
 #+BEGIN_SRC emacs-lisp
 (require 'ivy)
+(require 'counsel)
+(require 'swiper)
+
 (eval-after-load 'ivy
   '(ivy-mode t)
   )
-;; (counsel-mode t)
-;; (ivy-explorer-mode t)
 
 (eval-after-load 'counsel
   '(counsel-mode t)
 )
+
 (setq ivy-use-virtual-buffers t)
-(when (>= emacs-major-version 27)
-  (setq xref-show-definitions-function #'ivy-xref-show-defs))
-(setq xref-show-xrefs-function #'ivy-xref-show-xrefs)
 
 ;; function
 (defun resume-ivy-with-prefix-arg ()
@@ -428,8 +429,10 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (global-set-key (kbd "M-p") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'forward-paragraph)
 (global-set-key (kbd "C-o") 'newline-and-indent)
+(global-set-key (kbd "M-/") 'company-complete)
 
-(global-set-key (kbd "C-c j") 'shortcut-prefix)
+(global-set-key (kbd "C-c j") 'editor-shortcut-prefix)
+(global-set-key (kbd "C-c c") 'code-shortcut-prefix)
 (global-set-key (kbd "C-c k") 'move-shortcut-prefix)
 
 (define-prefix-command 'move-shortcut-prefix)
@@ -438,33 +441,40 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (define-key move-shortcut-prefix (kbd "h") 'windmove-left)
 (define-key move-shortcut-prefix (kbd "l") 'windmove-right)
 
-(define-prefix-command 'shortcut-prefix)
-(define-key shortcut-prefix (kbd "f") 'find-name-dired)
-(define-key shortcut-prefix (kbd "F") 'projectile-find-file)
-(define-key shortcut-prefix (kbd "g") 'rg-thing-at-point)
-(define-key shortcut-prefix (kbd "G") 'rg-thing-at-point-default)
-(define-key shortcut-prefix (kbd "e") 'open-fold)
-(define-key shortcut-prefix (kbd "b") 'pop-tag-mark)
-(define-key shortcut-prefix (kbd "m") 'magit-status)
+(define-prefix-command 'editor-shortcut-prefix)
+(define-key editor-shortcut-prefix (kbd "f") 'find-name-dired)
+(define-key editor-shortcut-prefix (kbd "F") 'projectile-find-file)
+(define-key editor-shortcut-prefix (kbd "g") 'rg-thing-at-point)
+(define-key editor-shortcut-prefix (kbd "G") 'rg-thing-at-point-default)
+(define-key editor-shortcut-prefix (kbd "e") 'open-fold)
+(define-key editor-shortcut-prefix (kbd "b") 'pop-tag-mark)
+(define-key editor-shortcut-prefix (kbd "m") 'magit-status)
 
-(define-key shortcut-prefix (kbd "l") 'org-store-link)
-(define-key shortcut-prefix (kbd "C-l") 'org-insert-link)
-(define-key shortcut-prefix (kbd "a") 'org-agenda)
-(define-key shortcut-prefix (kbd "c") 'org-capture)
+(define-key editor-shortcut-prefix (kbd "l") 'org-store-link)
+(define-key editor-shortcut-prefix (kbd "C-l") 'org-insert-link)
+(define-key editor-shortcut-prefix (kbd "a") 'org-agenda)
+(define-key editor-shortcut-prefix (kbd "c") 'org-capture)
 
-(define-key shortcut-prefix (kbd "s") 'swiper-isearch-thing-at-point)
-(define-key shortcut-prefix (kbd "r") 'counsel-recentf)
-(define-key shortcut-prefix (kbd "i") 'counsel-imenu)
-(define-key shortcut-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
+(define-key editor-shortcut-prefix (kbd "s") 'swiper-isearch-thing-at-point)
+(define-key editor-shortcut-prefix (kbd "r") 'counsel-recentf)
+(define-key editor-shortcut-prefix (kbd "i") 'counsel-imenu)
+(define-key editor-shortcut-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
 
 ;; [[https://github.com/magnars/expand-region.el][magnars/expand-region.el: Emacs extension to increase ;; selected region by semantic units.]]
 ;; If you expand too far, you can contract the region by pressing - (minus key), or by prefixing the ;; ;; shortcut you defined with a negative argument: C-- C-=.
 ;;
-(define-key shortcut-prefix (kbd "=") 'er/expand-region)
+(define-key editor-shortcut-prefix (kbd "=") 'er/expand-region)
+
+(define-key editor-shortcut-prefix (kbd "=") 'er/expand-region)
 
 ;; my define function map
-(define-key shortcut-prefix (kbd "1") 'store-cur-file-name)
+(define-key editor-shortcut-prefix (kbd "1") 'store-cur-file-name)
+
+(define-prefix-command 'code-shortcut-prefix)
+(define-key code-shortcut-prefix (kbd "=") 'lsp-format-region)
+
 #+END_SRC
+
 * Appendix
   #+BEGIN_SRC shell
   ;; (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extra=+q --fields=+iaS --languages=c -R -f tags-c")
