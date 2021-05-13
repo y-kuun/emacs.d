@@ -46,7 +46,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 
 (line-number-mode)
 (column-number-mode)
-(global-visual-line-mode 0)
+(global-visual-line-mode 1)
 (global-linum-mode 0)
 ;; 让一些插件可以支持语法相关的内容
 (semantic-mode t)
@@ -370,14 +370,18 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq lsp-enable-completion-at-point t)
 (setq lsp-response-timeout 5)
 (setq lsp-diagnostic-package :none)
+(setq lsp-completion-provider :none)	;; 如果不进行相关的屏蔽 capf 会高于其他的backends，相关的设置已经写入了company模块的部分，不需要lsp再次设置
+
 #+END_SRC
 * Company
 #+BEGIN_SRC emacs-lisp
 (setq 
  company-minimum-prefix-length 3
  company-idle-delay 0.1
- company-backends '(company-capf company-dabbrev company-dabbrev-code company-elisp company-lua)
-)
+ )
+(global-company-mode t)
+(setq company-backends '((company-files company-keywords company-capf company-dabbrev-code company-etags company-dabbrev)))
+(setq company-dabbrev-downcase nil)
 #+END_SRC
 * Yasnippet
 #+BEGIN_SRC emacs-lisp
