@@ -93,138 +93,148 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+END_SRC
 
 * Function Defines
- #+BEGIN_SRC emacs-lisp
- (defun ykdu-command (command-buffer)
-   "Run shell command and output to given buffer"
-   (let* ((output-buffer command-buffer)
-          (error-buffer output-buffer))
+#+BEGIN_SRC emacs-lisp
+(defun ykdu-command (command-buffer)
+  "Run shell command and output to given buffer"
+  (let* ((output-buffer command-buffer)
+         (error-buffer output-buffer))
 
-     (setq compile_command (read-string "Shell Command: "))
-     (get-buffer-create output-buffer)
-     (get-buffer-create error-buffer)
-     (kill-buffer output-buffer-name)
-     ;;    (shell-command s_command output-buffer error-buffer)
-     (switch-to-buffer-other-window output-buffer)
-     (with-current-buffer output-buffer
-       (read-only-mode -1)
-       (kill-region (point-min) (point-max))
-       (insert "Process Begins !!!!\n")
-       (insert (format-time-string "%F %H:%M:%S(%3N)"))
-       (insert "\n=====================================\n\n")
-       (let* ((command_result (shell-command-to-string compile_command)))
-         (insert (decode-coding-string command_result 'gbk)))
-       (insert "\n=====================================\n")
-       (insert "Process Finished !!!!\n")
-       (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
-       (compilation-mode)
-       (beginning-of-buffer)
-       )
-     ;; back to previous window
-     (other-window -1)
-     )
-   )
+    (setq compile_command (read-string "Shell Command: "))
+    (get-buffer-create output-buffer)
+    (get-buffer-create error-buffer)
+    (kill-buffer output-buffer-name)
+    ;;    (shell-command s_command output-buffer error-buffer)
+    (switch-to-buffer-other-window output-buffer)
+    (with-current-buffer output-buffer
+      (read-only-mode -1)
+      (kill-region (point-min) (point-max))
+      (insert "Process Begins !!!!\n")
+      (insert (format-time-string "%F %H:%M:%S(%3N)"))
+      (insert "\n=====================================\n\n")
+      (let* ((command_result (shell-command-to-string compile_command)))
+        (insert (decode-coding-string command_result 'gbk)))
+      (insert "\n=====================================\n")
+      (insert "Process Finished !!!!\n")
+      (insert (format-time-string "%Y-%m-%d %H:%M:%S(%3N)"))
+      (compilation-mode)
+      (beginning-of-buffer)
+      )
+    ;; back to previous window
+    (other-window -1)
+    )
+  )
 
- (defun ykdu-shell-command ()
-   (interactive)
-   (let (
-         (bf-name (buffer-file-name))
-         (output-buffer-name "*ykdu-shell*")
-         )
-     (let (
-           (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
-           )
-       (ykdu-command output-buffer-name)
-       )
-     )
-   )
+(defun ykdu-shell-command ()
+  (interactive)
+  (let (
+        (bf-name (buffer-file-name))
+        (output-buffer-name "*ykdu-shell*")
+        )
+    (let (
+          (default-directory (if (not bf-name) "~" (file-name-directory bf-name)))
+          )
+      (ykdu-command output-buffer-name)
+      )
+    )
+  )
 
- ;; (defun workspace-coding-set (coding)
- ;;   (interactive "zCoding: ")
- ;;   "set defualt coding systems and prefer coding system at once"
- ;;   (set-default-coding-systems coding)
- ;;   ;; (locale-coding-system coding)
- ;;   (prefer-coding-system coding)
- ;;   )
+;; (defun workspace-coding-set (coding)
+;;   (interactive "zCoding: ")
+;;   "set defualt coding systems and prefer coding system at once"
+;;   (set-default-coding-systems coding)
+;;   ;; (locale-coding-system coding)
+;;   (prefer-coding-system coding)
+;;   )
 
- (defun open-fold (path)
-   "update for mf client"
-   (interactive "Dstart from: ")
-   (message (concat "start \"" path "\""))
-   (browse-url-of-file path)
-   )
+(defun open-fold (path)
+  "update for mf client"
+  (interactive "Dstart from: ")
+  (message (concat "start \"" path "\""))
+  (browse-url-of-file path)
+  )
 
- (defun save-dir-path (path)
-   (interactive "Dcopy: ")
-   ;; (message (concat "start " path))
-   (kill-new path)
-   )
+(defun save-dir-path (path)
+  (interactive "Dcopy: ")
+  ;; (message (concat "start " path))
+  (kill-new path)
+  )
 
- (defun copy-cur-dir-path (path)
-   (interactive "Dcopy from: ")
-   ;; (message (concat "start " path))
-   (kill-new path)
-   )
+(defun copy-cur-dir-path (path)
+  (interactive "Dcopy from: ")
+  ;; (message (concat "start " path))
+  (kill-new path)
+  )
 
- (defun store-cur-file-name ()
-   (interactive)
-   (kill-new (file-name-nondirectory buffer-file-name))
-   )
+(defun store-cur-file-name ()
+  (interactive)
+  (kill-new (file-name-nondirectory buffer-file-name))
+  )
 
- (setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log"))
+(setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log"))
 
- (defun rg-thing-at-point-default (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (ripgrep-regexp search-term default-directory rg-ykuun-args)
-   )
+(defun rg-thing-at-point-default (search-term &optional arg)
+  (interactive
+   (list
+    (read-from-minibuffer (format "Default Ripgrep %ssearch for: "
+                                  (if current-prefix-arg
+                                      "regexp "
+                                    ""))
+                          (projectile-symbol-or-selection-at-point))
+    current-prefix-arg))
+  (ripgrep-regexp search-term default-directory rg-ykuun-args)
+  )
 
- (defun rg-thing-at-point (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "Ripgrep %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (if (projectile-project-root)
-       (progn
-         (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
-         )
-     (message "default root do ripgrep")
-     (ripgrep-regexp search-term default-directory rg-ykuun-args)
-     )
-   )
+(defun rg-thing-at-point (search-term &optional arg)
+  (interactive
+   (list
+    (read-from-minibuffer (format "Ripgrep %ssearch for: "
+                                  (if current-prefix-arg
+                                      "regexp "
+                                    ""))
+                          (projectile-symbol-or-selection-at-point))
+    current-prefix-arg))
+  (if (projectile-project-root)
+      (progn
+        (ripgrep-regexp search-term (projectile-project-root) rg-ykuun-args)
+        )
+    (message "default root do ripgrep")
+    (ripgrep-regexp search-term default-directory rg-ykuun-args)
+    )
+  )
 
- (defun xref-find-apropos-at-point (search-term &optional arg)
-   (interactive
-    (list
-     (read-from-minibuffer (format "xref find apropos %ssearch for: "
-                                   (if current-prefix-arg
-                                       "regexp "
-                                     ""))
-                           (projectile-symbol-or-selection-at-point))
-     current-prefix-arg))
-   (xref-find-apropos search-term)
-   )
+(defun xref-find-apropos-at-point (search-term &optional arg)
+  (interactive
+   (list
+    (read-from-minibuffer (format "xref find apropos %ssearch for: "
+                                  (if current-prefix-arg
+                                      "regexp "
+                                    ""))
+                          (projectile-symbol-or-selection-at-point))
+    current-prefix-arg))
+  (xref-find-apropos search-term)
+  )
 
- ;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
- ;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
- ;;   (message (concat current-root-dir "/"))
- ;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
- ;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
- ;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
- ;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
- ;;   )
- #+END_SRC
+(defun occur-thing-at-point (search-term &optional arg)
+  (interactive
+   (list
+    (read-from-minibuffer "List lins for regexp: "
+                          (projectile-symbol-or-selection-at-point)
+                          current-prefix-arg)
+    ))
+  (occur search-term)
+  )
+
+;; (defun add-cur-tags-in-dir-root-to-tags-table-list (current-root-dir)
+;;   (interactive (list (read-directory-name "DirRootForTags: " (projectile-project-root))))
+;;   (message (concat current-root-dir "/"))
+;;   (if (file-readable-p (concat current-root-dir "tags-c")) 
+;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-c")) nil)
+;;   (if (file-readable-p (concat current-root-dir "tags-lua")) 
+;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-lua")) nil)
+;;   (if (file-readable-p (concat current-root-dir "tags-cpp")) 
+;;       (add-to-list 'tags-table-list (concat current-root-dir "tags-cpp")) nil)
+;;   )
+#+END_SRC
 * Programming Language
 ** C\CPP
 #+BEGIN_SRC emacs-lisp
@@ -236,10 +246,12 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (setq-default indent-tabs-mode t)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 #+END_SRC
+
 ** Lua
 #+BEGIN_SRC emacs-lisp
 (setq-default lua-indent-level 4)
 #+END_SRC
+
 ** Python
 #+BEGIN_SRC emacs-lisp
 (setq-default python-indent-offset 4)
@@ -435,9 +447,10 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (global-set-key (kbd "C-o") 'newline-and-indent)
 (global-set-key (kbd "M-/") 'company-complete)
 
-(global-set-key (kbd "C-c j") 'editor-shortcut-prefix)
-(global-set-key (kbd "C-c c") 'code-shortcut-prefix)
 (global-set-key (kbd "C-c k") 'move-shortcut-prefix)
+(global-set-key (kbd "C-c j") 'editor-shortcut-prefix)
+(global-set-key (kbd "C-c s") 'search-shortcut-prefix)
+(global-set-key (kbd "C-c c") 'code-shortcut-prefix)
 
 (define-prefix-command 'move-shortcut-prefix)
 (define-key move-shortcut-prefix (kbd "j") 'windmove-down)
@@ -446,10 +459,6 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (define-key move-shortcut-prefix (kbd "l") 'windmove-right)
 
 (define-prefix-command 'editor-shortcut-prefix)
-(define-key editor-shortcut-prefix (kbd "f") 'find-name-dired)
-(define-key editor-shortcut-prefix (kbd "F") 'projectile-find-file)
-(define-key editor-shortcut-prefix (kbd "g") 'rg-thing-at-point)
-(define-key editor-shortcut-prefix (kbd "G") 'rg-thing-at-point-default)
 (define-key editor-shortcut-prefix (kbd "e") 'open-fold)
 (define-key editor-shortcut-prefix (kbd "b") 'pop-tag-mark)
 (define-key editor-shortcut-prefix (kbd "m") 'magit-status)
@@ -458,25 +467,25 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (define-key editor-shortcut-prefix (kbd "C-l") 'org-insert-link)
 (define-key editor-shortcut-prefix (kbd "a") 'org-agenda)
 (define-key editor-shortcut-prefix (kbd "c") 'org-capture)
-
-(define-key editor-shortcut-prefix (kbd "s") 'swiper-isearch-thing-at-point)
-(define-key editor-shortcut-prefix (kbd "r") 'counsel-recentf)
-(define-key editor-shortcut-prefix (kbd "i") 'counsel-imenu)
-(define-key editor-shortcut-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
-
 ;; [[https://github.com/magnars/expand-region.el][magnars/expand-region.el: Emacs extension to increase ;; selected region by semantic units.]]
 ;; If you expand too far, you can contract the region by pressing - (minus key), or by prefixing the ;; ;; shortcut you defined with a negative argument: C-- C-=.
-;;
 (define-key editor-shortcut-prefix (kbd "=") 'er/expand-region)
-
-(define-key editor-shortcut-prefix (kbd "=") 'er/expand-region)
-
 ;; my define function map
 (define-key editor-shortcut-prefix (kbd "1") 'store-cur-file-name)
 
+(define-prefix-command 'search-shortcut-prefix)
+(define-key search-shortcut-prefix (kbd "f") 'find-name-dired)
+(define-key search-shortcut-prefix (kbd "F") 'projectile-find-file)
+(define-key search-shortcut-prefix (kbd "g") 'rg-thing-at-point)
+(define-key search-shortcut-prefix (kbd "G") 'rg-thing-at-point-default)
+(define-key search-shortcut-prefix (kbd "o") 'occur-thing-at-point)
+(define-key search-shortcut-prefix (kbd "s") 'swiper-isearch-thing-at-point)
+(define-key search-shortcut-prefix (kbd "r") 'counsel-recentf)
+(define-key search-shortcut-prefix (kbd "i") 'counsel-imenu)
+(define-key search-shortcut-prefix (kbd "C-r") 'resume-ivy-with-prefix-arg)
+
 (define-prefix-command 'code-shortcut-prefix)
 (define-key code-shortcut-prefix (kbd "=") 'lsp-format-region)
-
 #+END_SRC
 
 * Appendix
