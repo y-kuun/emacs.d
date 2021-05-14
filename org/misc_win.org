@@ -1,7 +1,7 @@
 #  -*- coding: utf-8 -*-
 
 * proxy
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp for tencent
 (setq url-proxy-services '(("http" . "127.0.0.1:12639")))
 #+END_SRC
 * font
@@ -27,33 +27,13 @@
 #+BEGIN_SRC emacs-lisp
 (prefer-coding-system 'utf-8)
 #+END_SRC
-* functions
+* Windows Optimization
 #+BEGIN_SRC emacs-lisp
-;; (defun ctags-create (path)
-;;   (interactive "Dcreate ctags from:")
-;;   (cd path)
-;;   (pwd)
-;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c -R -f tags-c")
-;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=c++ -R -f tags-cpp")
-;;   (async-shell-command "ctags -e --if0=yes --c-kinds=+px --c++-kinds=+px --extras=+q --fields=+iaS --languages=lua -R -f tags-lua")
-;;   )
-;; find . -type f \( -name "*.cpp" -o -name "*.h" \) -exec ls {} ; ctags -a -B --declarations -d --globals --members -Q -T --lang=c++
+(setq w32-get-true-file-attributes nil)
 #+END_SRC
 * xref tags
 #+BEGIN_SRC emacs-lisp
 (setq tags-table-list '())
-#+END_SRC
-* flycheck args
-#+BEGIN_SRC emacs-lisp
-#+END_SRC
-* irony
-#+BEGIN_SRC emacs-lisp
-;; Windows performance tweaks
-(when (boundp 'w32-pipe-read-delay)
-  (setq w32-pipe-read-delay 0))
-;; Set the buffer size to 64K on Windows (from the original 4K)
-(when (boundp 'w32-pipe-buffer-size)
-  (setq irony-server-w32-pipe-buffer-size (* 64 1024)))
 #+END_SRC
 * diff
 #+BEGIN_SRC emacs-lisp
