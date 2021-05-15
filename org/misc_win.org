@@ -2,7 +2,10 @@
 
 * proxy
 #+BEGIN_SRC emacs-lisp for tencent
-(setq url-proxy-services '(("http" . "127.0.0.1:12639")))
+(when (not (string= (getenv "USERNAME") "ykdu"))
+  (message "set url-proxy-services for tencent network")
+  (setq url-proxy-services '(("http" . "127.0.0.1:12639")))
+)
 #+END_SRC
 * font
 #+BEGIN_SRC emacs-lisp
