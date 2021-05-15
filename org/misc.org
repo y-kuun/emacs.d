@@ -392,7 +392,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
  company-idle-delay 0.1
  )
 (global-company-mode t)
-(setq company-backends '((company-files company-keywords company-capf company-dabbrev-code company-etags company-dabbrev)))
+(setq company-backends '((company-capf company-files company-keywords company-dabbrev-code company-etags company-dabbrev)))
 (setq company-dabbrev-downcase nil)
 #+END_SRC
 * Yasnippet
