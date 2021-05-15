@@ -2,7 +2,7 @@
 
 * proxy
 #+BEGIN_SRC emacs-lisp
-(setq url-proxy-services '(("http" . "127.0.0.1:12639")))
+;; (setq url-proxy-services '(("http" . "127.0.0.1:12639")))
 #+END_SRC
 * font
 #+BEGIN_SRC emacs-lisp
