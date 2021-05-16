@@ -256,7 +256,11 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+BEGIN_SRC emacs-lisp
 (setq-default python-indent-offset 4)
 #+END_SRC
-
+** C#
+#+BEGIN_SRC emacs-lisp
+(setq lsp-csharp-server-path (expand-file-name "bin/omnisharp/OmniSharp.exe" user-emacs-directory))
+(setq lsp-csharp-server-install-dir (expand-file-name "bin/omnisharp/" user-emacs-directory))
+#+END_SRC
 * Version Control
 #+BEGIN_SRC emacs-lisp
 (remove-hook 'find-file-hook 'vc-refresh-state)
@@ -365,6 +369,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 #+END_SRC
 * LSP Mode
 #+BEGIN_SRC emacs-lisp
+(require 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
 (add-hook 'c-mode-hook 'lsp)
 (functionp 'json-serialize)
