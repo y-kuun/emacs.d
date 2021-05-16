@@ -50,7 +50,7 @@ cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPIL
 (global-linum-mode 0)
 ;; 让一些插件可以支持语法相关的内容
 (semantic-mode t)
-
+(keychain-refresh-environment)
 ;; disable annoying beeeeep !!!
 (setq visible-bell nil ring-bell-function (lambda ()))
 #+END_SRC

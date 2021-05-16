@@ -14,7 +14,7 @@
  '(gnutls-algorithm-priority "normal:-vers-tls1.3")
  '(org-agenda-files '("d:/workspace/NotesDoMatter/Plans/WeeklyToDo.org"))
  '(package-selected-packages
-   '(company-lua company flycheck gnu-elpa-keyring-update csharp-mode eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region yasnippet projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server cmake-mode magit markdown-mode)))
+   '(keychain-environment company-lua company flycheck gnu-elpa-keyring-update csharp-mode eldoc lua-mode lsp-ivy lsp-mode monokai-theme ivy-explorer ivy-omni-org counsel-projectile counsel ivy elf-mode pdf-tools ob-async expand-region yasnippet projectile-ripgrep projectile glsl-mode cnfonts pyim edit-server cmake-mode magit markdown-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
