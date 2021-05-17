@@ -16,6 +16,9 @@
 set LDFLAGS="-fuse-ld=lld-link"
 cmake -H. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_C_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang.exe" -DCMAKE_CXX_COMPILER:PATH="D:\\Program Files\\LLVM\\bin\\clang++.exe" -DCMAKE_C_COMPILER_ID="Clang" -DCMAKE_CXX_COMPILER_ID="Clang" -DCMAKE_SYSTEM_NAME="Generic" ..
 #+END_SRC
+** Windows Client
+rewrite the shortcut
+C:\emacs-27.1-x86_64\bin\emacsclientw.exe --create-frame --no-wait --alternate-editor runemacs.exe
 ** LINKS
 [[https://www.emacswiki.org/emacs/OptimizingEmacsStartup][EmacsWiki: Optimizing Emacs Startup]]
 [[https://emacs-lsp.github.io/lsp-mode/page/performance/][Performance - LSP Mode - LSP support for Emacs]]
