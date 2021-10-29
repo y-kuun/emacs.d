@@ -173,7 +173,7 @@ C:\emacs-27.1-x86_64\bin\emacsclientw.exe --create-frame --no-wait --alternate-e
   (kill-new (file-name-nondirectory buffer-file-name))
   )
 
-(setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log"))
+(setq rg-ykuun-args '("--fixed-strings" "-i" "--vimgrep" "-t cpp" "-t py" "-t lua" "-t config" "-t txt" "-t lisp" "-t org" "-t cs" "-t json" "-t log" "--type-add nut:*.nut -t nut" "--type-add gnut:*.gnut -t gnut"))
 
 (defun rg-thing-at-point-default (search-term &optional arg)
   (interactive
@@ -253,6 +253,7 @@ C:\emacs-27.1-x86_64\bin\emacsclientw.exe --create-frame --no-wait --alternate-e
 ** Lua
 #+BEGIN_SRC emacs-lisp
 (setq-default lua-indent-level 4)
+(setq lsp-clients-emmy-lua-jar-path (expand-file-name "bin/lua/EmmyLua-LS-all.jar" user-emacs-directory))
 #+END_SRC
 
 ** Python
@@ -400,8 +401,12 @@ C:\emacs-27.1-x86_64\bin\emacsclientw.exe --create-frame --no-wait --alternate-e
  company-idle-delay 0.1
  )
 (global-company-mode t)
+
 (setq company-backends '((company-capf company-files company-keywords company-dabbrev-code company-etags company-dabbrev)))
 (setq company-dabbrev-downcase nil)
+
+(setq company-transformers '(company-sort-by-backend-importance))
+(add-hook 'after-init-hook #'company-statistics-mode)
 #+END_SRC
 * Yasnippet
 #+BEGIN_SRC emacs-lisp
@@ -494,6 +499,7 @@ C:\emacs-27.1-x86_64\bin\emacsclientw.exe --create-frame --no-wait --alternate-e
 
 (define-prefix-command 'code-shortcut-prefix)
 (define-key code-shortcut-prefix (kbd "=") 'lsp-format-region)
+(define-key code-shortcut-prefix (kbd "y") 'yas-expand)
 #+END_SRC
 
 * Appendix
